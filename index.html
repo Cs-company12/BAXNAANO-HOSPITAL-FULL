@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Baxnaano Hospital HMS</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══ CSS VARIABLES ═══ */
+:root{
+  --c1:#0f766e;--c1h:#0d9488;--c1l:#ccfbf1;--c1ll:#f0fdfa;
+  --c2:#1e3a5f;--c2h:#2563a8;
+  --red:#dc2626;--redl:#fee2e2;
+  --amber:#d97706;--amberl:#fef3c7;
+  --green:#16a34a;--greenl:#dcfce7;
+  --purple:#7c3aed;--purplel:#ede9fe;
+  --blue:#2563eb;--bluel:#dbeafe;
+  --bg:#f1f5f9;--card:#fff;
+  --text:#0f172a;--muted:#64748b;--border:#e2e8f0;
+  --sh:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --sh2:0 8px 32px rgba(0,0,0,.14);
+  --r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'Sora',sans-serif;background:var(--bg);color:var(--text);overflow:hidden}
+.mono{font-family:'JetBrains Mono',monospace}
+
+/* ═══ LOGIN ═══ */
+#login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0f766e 0%,#1e3a5f 60%,#0f172a 100%);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-box{background:rgba(255,255,255,.07);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.15);border-radius:20px;padding:44px;width:440px;text-align:center}
+.login-logo{font-size:52px;margin-bottom:10px}
+.login-box h1{color:#fff;font-size:26px;font-weight:800;letter-spacing:-1px;margin-bottom:3px}
+.login-box .sub{color:rgba(255,255,255,.45);font-size:12px;margin-bottom:28px}
+.role-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:22px}
+.role-btn{padding:12px 6px;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.13);border-radius:10px;color:rgba(255,255,255,.75);font-family:'Sora',sans-serif;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:5px}
+.role-btn span{font-size:22px}
+.role-btn:hover,.role-btn.sel{background:var(--c1);border-color:var(--c1h);color:#fff;transform:translateY(-2px)}
+.login-fields{display:flex;flex-direction:column;gap:10px;margin-bottom:18px;text-align:left}
+.lf-label{font-size:10px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.lf-input{width:100%;padding:10px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;font-family:'Sora',sans-serif;font-size:13px;outline:none}
+.lf-input::placeholder{color:rgba(255,255,255,.35)}
+.lf-input:focus{border-color:var(--c1h)}
+.login-btn{width:100%;padding:13px;background:var(--c1);border:none;border-radius:10px;color:#fff;font-family:'Sora',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:var(--c1h)}
+.server-indicator{display:flex;align-items:center;gap:6px;justify-content:center;margin-top:14px;font-size:11px;color:rgba(255,255,255,.4)}
+.server-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ═══ APP SHELL ═══ */
+#app{display:none;height:100vh;flex-direction:column}
+#app.visible{display:flex}
+
+/* TOP BAR */
+.topbar{height:50px;background:var(--c2);display:flex;align-items:center;padding:0 18px;gap:6px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.brand{display:flex;align-items:center;gap:9px;margin-right:16px;color:#fff;flex-shrink:0}
+.brand-ic{width:32px;height:32px;background:var(--c1);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:17px}
+.brand span{font-size:14px;font-weight:800;letter-spacing:-.4px}
+.top-nav-btn{padding:5px 12px;border-radius:6px;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,.6);transition:all .15s;white-space:nowrap}
+.top-nav-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.top-nav-btn.active{background:var(--c1);color:#fff}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.role-badge{padding:3px 10px;background:rgba(255,255,255,.1);border-radius:20px;color:rgba(255,255,255,.8);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.user-badge{font-size:11px;color:rgba(255,255,255,.5)}
+.notif-btn{width:30px;height:30px;background:rgba(255,255,255,.08);border:none;border-radius:7px;color:rgba(255,255,255,.7);cursor:pointer;font-size:14px;position:relative}
+.notif-dot{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--red);border-radius:50%}
+.logout-btn{padding:5px 12px;background:rgba(220,38,38,.75);border:none;border-radius:6px;color:#fff;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;cursor:pointer}
+
+/* LAYOUT */
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:200px;background:var(--c2);flex-shrink:0;padding:10px 7px;overflow-y:auto;display:flex;flex-direction:column;gap:1px;border-right:1px solid rgba(255,255,255,.07)}
+.sb-sec{font-size:9px;font-weight:700;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:1.5px;padding:14px 10px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 11px;border-radius:7px;font-size:11px;font-weight:600;color:rgba(255,255,255,.55);cursor:pointer;transition:all .13s}
+.sb-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.sb-item.active{background:var(--c1);color:#fff}
+.sb-item .ic{font-size:15px;width:18px;text-align:center}
+.sb-badge{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:700;padding:2px 5px;border-radius:8px}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topstrip{padding:8px 22px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted);flex-shrink:0}
+.content{flex:1;overflow-y:auto;padding:20px 22px}
+
+/* PAGES */
+.pg{display:none}.pg.active{display:block}
+
+/* KPI */
+.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px}
+.kpi{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:var(--sh);border-left:4px solid transparent;transition:transform .2s}
+.kpi:hover{transform:translateY(-2px)}
+.kpi.teal{border-color:var(--c1)}.kpi.blue{border-color:var(--blue)}.kpi.amber{border-color:var(--amber)}.kpi.green{border-color:var(--green)}.kpi.purple{border-color:var(--purple)}.kpi.red{border-color:var(--red)}
+.kpi-lbl{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px}
+.kpi-val{font-size:26px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--text)}
+.kpi-sub{font-size:10px;color:var(--muted);margin-top:2px}
+
+/* CARD */
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.card-hd{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.card-title{font-size:13px;font-weight:700;color:var(--text)}
+.card-hd .ml{margin-left:auto;display:flex;gap:6px;align-items:center}
+
+/* BUTTONS */
+.btn{padding:7px 14px;border-radius:7px;font-family:'Sora',sans-serif;font-size:11px;font-weight:700;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .13s;white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn-teal{background:var(--c1);color:#fff}.btn-teal:hover{background:var(--c1h)}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:#1d4ed8}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#b91c1c}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#15803d}
+.btn-amber{background:var(--amber);color:#fff}.btn-amber:hover{background:#b45309}
+.btn-purple{background:var(--purple);color:#fff}.btn-purple:hover{background:#6d28d9}
+.btn-ghost{background:transparent;color:var(--c1);border:1.5px solid var(--c1)}.btn-ghost:hover{background:var(--c1ll)}
+.btn-sm{padding:4px 10px;font-size:10px}
+.btn-xs{padding:2px 7px;font-size:9px;border-radius:5px}
+
+/* TABLES */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--bg);padding:8px 12px;text-align:left;font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;border-bottom:1px solid var(--border)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s;cursor:pointer}
+tbody tr:hover{background:#f8fafc}
+tbody tr:last-child{border-bottom:none}
+td{padding:9px 12px;font-size:11px;vertical-align:middle}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:2px 9px;border-radius:20px;font-size:9px;font-weight:700}
+.b-wait{background:var(--amberl);color:var(--amber)}
+.b-done{background:var(--greenl);color:var(--green)}
+.b-pend{background:var(--bluel);color:var(--blue)}
+.b-cancel{background:var(--redl);color:var(--red)}
+.b-new{background:var(--c1l);color:var(--c1)}
+.b-follow{background:var(--purplel);color:var(--purple)}
+
+/* SEARCH */
+.srch{flex:1;min-width:140px;padding:6px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Sora',sans-serif;font-size:11px;outline:none;transition:border .13s}
+.srch:focus{border-color:var(--c1)}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.fg label{font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
+.fg input,.fg select,.fg textarea{padding:8px 11px;border:1.5px solid var(--border);border-radius:7px;font-family:'Sora',sans-serif;font-size:12px;outline:none;transition:border .13s;background:#fff}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--c1)}
+.fg textarea{resize:vertical;min-height:70px}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:500;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:540px;max-height:88vh;overflow-y:auto;box-shadow:var(--sh2);animation:fup .2s ease}
+.modal.wide{width:660px}
+.modal.narrow{width:420px}
+@keyframes fup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-size:16px;font-weight:800;color:var(--c2);margin-bottom:18px;display:flex;align-items:center;gap:7px}
+.modal-footer{display:flex;justify-content:flex-end;gap:8px;margin-top:18px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* SLIDE PANEL */
+.panel-bg{display:none;position:fixed;inset:0;background:rgba(15,23,42,.35);z-index:400}
+.panel-bg.open{display:flex;justify-content:flex-end}
+.panel{width:580px;height:100%;background:#fff;overflow-y:auto;box-shadow:-8px 0 40px rgba(0,0,0,.18);animation:slin .23s ease;display:flex;flex-direction:column}
+@keyframes slin{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.panel-hd{background:linear-gradient(135deg,var(--c2),#0f4c81);color:#fff;padding:20px 22px;position:relative;flex-shrink:0}
+.panel-hd h2{font-size:18px;font-weight:800;margin-bottom:2px}
+.panel-hd p{font-size:11px;opacity:.65}
+.panel-close{position:absolute;top:14px;right:14px;width:28px;height:28px;background:rgba(255,255,255,.15);border:none;border-radius:50%;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.panel-acts{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:7px;flex-wrap:wrap;flex-shrink:0}
+.panel-body{padding:18px 22px;flex:1;overflow-y:auto}
+
+/* TABS */
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px}
+.tab{padding:8px 14px;font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .13s}
+.tab.active{color:var(--c1);border-color:var(--c1)}
+.tab-pane{display:none}.tab-pane.active{display:block}
+
+/* INFO GRID */
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.ig-item label{font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:2px}
+.ig-item span{font-size:12px;font-weight:600;color:var(--text)}
+
+/* SEC LABEL */
+.sec-lbl{font-size:11px;font-weight:800;color:var(--c1);text-transform:uppercase;letter-spacing:.6px;margin:16px 0 9px;padding-bottom:5px;border-bottom:2px solid var(--c1l);display:flex;align-items:center;gap:5px}
+
+/* ALERT BANNER */
+.alert-banner{background:var(--redl);border:1px solid #fca5a5;border-radius:7px;padding:9px 14px;font-size:11px;font-weight:600;color:var(--red);margin-bottom:8px;display:flex;align-items:center;gap:7px}
+.alert-banner.amber{background:var(--amberl);border-color:#fcd34d;color:var(--amber)}
+
+/* CHART */
+.chart-wrap{padding:16px;height:200px;position:relative}
+
+/* TOP SOLD */
+.top-sold-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:11px}
+.top-sold-item:last-child{border-bottom:none}
+.top-sold-bar{height:5px;background:var(--c1l);border-radius:3px;margin-top:3px}
+.top-sold-bar-fill{height:100%;background:var(--c1);border-radius:3px}
+
+/* TRACKING LOG */
+.track-row{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);font-size:11px}
+.track-row:last-child{border-bottom:none}
+.track-dot{width:8px;height:8px;border-radius:50%;background:var(--c1);margin-top:3px;flex-shrink:0}
+.track-dot.red{background:var(--red)}
+.track-dot.amber{background:var(--amber)}
+.track-dot.blue{background:var(--blue)}
+
+/* NOTIFICATION PANEL */
+.notif-panel{position:fixed;top:54px;right:16px;width:320px;background:#fff;border-radius:12px;box-shadow:var(--sh2);z-index:300;display:none;max-height:400px;overflow-y:auto}
+.notif-panel.open{display:block}
+.notif-hd{padding:12px 16px;font-size:13px;font-weight:800;color:var(--c2);border-bottom:1px solid var(--border)}
+.notif-item{padding:10px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s}
+.notif-item:hover{background:#f8fafc}
+.notif-item:last-child{border-bottom:none}
+.notif-item-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px}
+.notif-item-sub{font-size:10px;color:var(--muted)}
+.notif-item.unread{border-left:3px solid var(--c1)}
+
+/* TOAST */
+.toast{position:fixed;bottom:22px;right:22px;background:var(--c1);color:#fff;padding:11px 18px;border-radius:9px;font-size:12px;font-weight:700;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;box-shadow:0 4px 20px rgba(15,118,110,.4)}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* SERVER STATUS BAR */
+.server-bar{background:linear-gradient(90deg,#0f766e,#1e3a5f);height:22px;display:flex;align-items:center;padding:0 16px;gap:16px;font-size:9px;color:rgba(255,255,255,.6);font-weight:600;flex-shrink:0}
+.server-bar .dot{width:5px;height:5px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:4px}
+.server-bar .dot.amber{background:#f59e0b}
+
+/* ═══ PRINT STYLES ═══ */
+@media print{
+  /* Hide everything by default */
+  body > *{display:none !important}
+  #print-frame{display:block !important;position:fixed;inset:0;background:#fff}
+  /* Hide browser chrome via blank title trick - handled in JS */
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🏥</div>
+    <h1>Baxnaano Hospital</h1>
+    <p class="sub">Hospital Management System · Multi-User Network</p>
+    <div class="role-grid">
+      <button class="role-btn" onclick="selRole(this,'admin')"><span>⚙️</span>Admin</button>
+      <button class="role-btn" onclick="selRole(this,'cashier')"><span>💵</span>Cashier</button>
+      <button class="role-btn" onclick="selRole(this,'doctor')"><span>👨‍⚕️</span>Doctor</button>
+      <button class="role-btn" onclick="selRole(this,'lab')"><span>🧪</span>Lab</button>
+      <button class="role-btn" onclick="selRole(this,'pharmacy')"><span>💊</span>Pharmacy</button>
+      <button class="role-btn" onclick="selRole(this,'nurse')"><span>💉</span>Nurse</button>
+    </div>
+    <div class="login-fields">
+      <div><div class="lf-label">Username</div><input class="lf-input" id="login-u" placeholder="Enter username" autocomplete="off"></div>
+      <div><div class="lf-label">Password</div><input class="lf-input" id="login-p" type="password" placeholder="Enter password"></div>
+    </div>
+    <button class="login-btn" onclick="login()">Sign In →</button>
+    <div class="server-indicator"><span class="server-dot"></span> Server Connected · Local Network</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- Server status bar -->
+  <div class="server-bar">
+    <span><span class="dot"></span>Server: Online</span>
+    <span id="active-users-bar"><span class="dot amber"></span>Active Users: 1</span>
+    <span id="server-time-bar">—</span>
+    <span style="margin-left:auto" id="current-user-bar">—</span>
+  </div>
+
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="brand"><div class="brand-ic">🏥</div><span>Baxnaano HMS</span></div>
+    <div id="top-nav" style="display:flex;gap:3px;overflow-x:auto"></div>
+    <div class="topbar-right">
+      <div class="user-badge" id="user-badge">—</div>
+      <div class="role-badge" id="role-label">—</div>
+      <button class="notif-btn" onclick="toggleNotifPanel()">🔔<span class="notif-dot" id="notif-dot" style="display:none"></span></button>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Notification panel -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-hd">🔔 Notifications <span id="notif-count" style="color:var(--red);font-size:11px"></span></div>
+    <div id="notif-list"></div>
+  </div>
+
+  <div class="layout">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main">
+      <div class="topstrip">
+        <span id="strip-text">Dashboard</span>
+        <span style="margin-left:auto;font-size:10px" id="strip-time">—</span>
+      </div>
+      <div class="content" id="content">
+
+        <!-- ══ REGISTRATION ══ -->
+        <div class="pg" id="pg-registration">
+          <div class="kpi-row">
+            <div class="kpi teal"><div class="kpi-lbl">Today Patients</div><div class="kpi-val" id="kpi-today">0</div><div class="kpi-sub">Registered today</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Next Queue #</div><div class="kpi-val" id="kpi-queue">#1</div></div>
+            <div class="kpi amber"><div class="kpi-lbl">New Patients</div><div class="kpi-val" id="kpi-new">0</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Follow-Ups</div><div class="kpi-val" id="kpi-follow">0</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">📋 Register New Appointment</span></div>
+            <div style="padding:18px">
+              <div class="fgrid">
+                <div class="fg"><label>Full Name *</label><input id="r-name" placeholder="Patient full name"></div>
+                <div class="fg"><label>Age *</label><input id="r-age" type="number" placeholder="Years" min="0" max="130"></div>
+                <div class="fg"><label>District *</label><input id="r-dist" placeholder="e.g. Hodan, Wadajir"></div>
+                <div class="fg"><label>Phone *</label><input id="r-phone" placeholder="06XXXXXXXX"></div>
+                <div class="fg"><label>Doctor *</label>
+                  <select id="r-doctor"><option value="">— Select Doctor —</option></select>
+                </div>
+                <div class="fg"><label>Patient Type</label>
+                  <select id="r-type">
+                    <option value="New">🆕 New Patient</option>
+                    <option value="Follow-Up">🔁 Follow-Up</option>
+                  </select>
+                </div>
+              </div>
+              <button class="btn btn-teal" onclick="registerPatient()">✓ Register & Print A5 Ticket</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd">
+              <span class="card-title">📅 Today's Queue</span>
+              <div class="ml"><input class="srch" style="width:200px" placeholder="🔍 Search..." oninput="filterQ(this)"></div>
+            </div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>#</th><th>Queue</th><th>Patient</th><th>Age</th><th>District</th><th>Assigned Doctor</th><th>Type</th><th>Status</th><th>Sent To</th><th>Action</th></tr></thead>
+                <tbody id="queue-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ DOCTOR WAITING LIST ══ -->
+        <div class="pg" id="pg-waiting">
+          <div class="kpi-row" style="grid-template-columns:repeat(3,1fr)">
+            <div class="kpi amber"><div class="kpi-lbl">My Waiting</div><div class="kpi-val" id="kpi-waiting">0</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Seen Today</div><div class="kpi-val" id="kpi-seen">0</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Lab Pending</div><div class="kpi-val" id="kpi-lab-pend">0</div></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">🩺 My Patients — Waiting List</span></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Queue</th><th>Patient</th><th>Age</th><th>Type</th><th>District</th><th>Sent By</th><th>Sent At</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="waiting-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ LAB PAYMENT ══ -->
+        <div class="pg" id="pg-lab-payment">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">💵 Lab Test Payments</span></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Patient</th><th>Test</th><th>Requested By</th><th>Price</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="lab-payment-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ LAB SECTION ══ -->
+        <div class="pg" id="pg-lab">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">🧪 Sample Collection & Results</span></div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Patient</th><th>Test</th><th>Requested By Doctor</th><th>Sent To Doctor</th><th>Status</th><th>Result Preview</th><th>Action</th></tr></thead>
+                <tbody id="lab-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ PHARMACY ══ -->
+        <div class="pg" id="pg-pharmacy">
+          <div class="kpi-row">
+            <div class="kpi teal"><div class="kpi-lbl">Today Sales</div><div class="kpi-val" id="ph-today-sales">$0</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">This Week</div><div class="kpi-val" id="ph-week-sales">$0</div></div>
+            <div class="kpi green"><div class="kpi-lbl">This Month</div><div class="kpi-val" id="ph-month-sales">$0</div></div>
+            <div class="kpi purple"><div class="kpi-lbl">Total Profit</div><div class="kpi-val" id="ph-total-profit">$0</div></div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi amber"><div class="kpi-lbl">Products</div><div class="kpi-val" id="ph-total-products">0</div></div>
+            <div class="kpi red"><div class="kpi-lbl">Low Stock</div><div class="kpi-val" id="ph-low-stock">0</div></div>
+            <div class="kpi red"><div class="kpi-lbl">Expired</div><div class="kpi-val" id="ph-expired-count">0</div></div>
+            <div class="kpi amber"><div class="kpi-lbl">Credit Owed</div><div class="kpi-val" id="ph-credit-amount">$0</div></div>
+          </div>
+          <div id="ph-alerts-wrap"></div>
+
+          <div style="display:grid;grid-template-columns:1.5fr .5fr;gap:16px;margin-bottom:16px">
+            <div>
+              <div class="card"><div class="card-hd"><span class="card-title">📈 Sales Chart — Last 14 Days</span></div><div class="chart-wrap"><canvas id="sales-chart"></canvas></div></div>
+              <div class="card">
+                <div class="card-hd"><span class="card-title">💳 POS — Selling</span></div>
+                <div style="padding:16px">
+                  <div class="fgrid">
+                    <div class="fg"><label>Medicine</label><select id="sale-med" onchange="updateSalePrice()"></select></div>
+                    <div class="fg"><label>Qty</label><input id="sale-qty" type="number" min="1" value="1" oninput="updateSaleTotal()"></div>
+                    <div class="fg"><label>Unit Price ($)</label><input id="sale-unit-price" type="number" step="0.01" oninput="updateSaleTotal()"></div>
+                    <div class="fg"><label>Total</label><input id="sale-total" readonly style="background:#f8fafc;font-weight:700;color:var(--c1)"></div>
+                    <div class="fg"><label>Payment</label>
+                      <select id="sale-payment" onchange="toggleSaleCustomer()">
+                        <option value="cash">💵 Cash</option>
+                        <option value="credit">🪙 Credit</option>
+                      </select>
+                    </div>
+                    <div class="fg" id="sale-customer-wrap" style="display:none"><label>Customer</label><select id="sale-customer"></select></div>
+                  </div>
+                  <div style="display:flex;gap:8px">
+                    <button class="btn btn-teal" onclick="addPharmacySale()">✓ Add Sale</button>
+                    <button class="btn btn-ghost" onclick="resetSaleForm()">↺ Reset</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="card">
+                <div class="card-hd"><span class="card-title">🏆 Top Sold</span></div>
+                <div style="padding:14px" id="top-sold-wrap"><div style="color:var(--muted);font-size:12px;text-align:center;padding:16px">No sales yet.</div></div>
+              </div>
+              <div class="card">
+                <div class="card-hd"><span class="card-title">⚠️ Alerts</span></div>
+                <div style="padding:10px"><div class="tbl-wrap"><table><thead><tr><th>Medicine</th><th>Expiry</th><th>Stock</th><th>Status</th></tr></thead><tbody id="expiry-tbody"></tbody></table></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-hd"><span class="card-title">👥 Credit Accounts</span><div class="ml">
+              <button class="btn btn-green btn-sm" onclick="openRecordPayment()">💰 Record Payment</button>
+              <button class="btn btn-teal btn-sm" onclick="openModal('modal-credit-customer')">+ Customer</button>
+            </div></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Total Credit</th><th>Paid</th><th>Remaining</th><th>Action</th></tr></thead><tbody id="credit-tbody"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">💊 Pending Prescriptions</span></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Patient</th><th>Doctor</th><th>Sent By</th><th>Sent At</th><th>Medicines</th><th>Status</th><th>Action</th></tr></thead><tbody id="pharmacy-tbody"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">📦 Medicine Stock</span><div class="ml"><button class="btn btn-teal btn-sm" onclick="openModal('modal-add-med')">+ Add Medicine</button></div></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Medicine</th><th>Sale $</th><th>Cost $</th><th>Stock</th><th>Low Alert</th><th>Expiry</th><th>Status</th><th>Edit</th></tr></thead><tbody id="stock-tbody"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">↩️ Returns</span><div class="ml"><button class="btn btn-amber btn-sm" onclick="openModal('modal-return')">+ Return</button></div></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Medicine</th><th>Qty</th><th>Reason</th><th>Refund</th></tr></thead><tbody id="returns-tbody"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">🧾 Recent Sales</span></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Medicine</th><th>Qty</th><th>Sale $</th><th>Cost $</th><th>Profit $</th><th>Payment</th></tr></thead><tbody id="sales-tbody"></tbody></table></div>
+          </div>
+        </div>
+
+        <!-- ══ TRACKING LOG ══ -->
+        <div class="pg" id="pg-tracking">
+          <div class="card">
+            <div class="card-hd"><span class="card-title">🔍 Data Transfer & Tracking Log</span><div class="ml"><input class="srch" style="width:200px" placeholder="Search..." oninput="filterTracking(this)"></div></div>
+            <div style="padding:14px" id="tracking-log-wrap">
+              <div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">No transfers logged yet.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ ADMIN ══ -->
+        <div class="pg" id="pg-admin">
+          <div class="kpi-row">
+            <div class="kpi teal"><div class="kpi-lbl">Total Patients</div><div class="kpi-val" id="kpi-total-pts">0</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Today Income</div><div class="kpi-val" id="kpi-income">$0</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Lab Tests</div><div class="kpi-val" id="kpi-lab-today">0</div></div>
+            <div class="kpi purple"><div class="kpi-lbl">Prescriptions</div><div class="kpi-val" id="kpi-rx-today">0</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="card">
+              <div class="card-hd"><span class="card-title">👥 Staff Users</span><div class="ml"><button class="btn btn-teal btn-sm" onclick="openModal('modal-add-user')">+ Add User</button></div></div>
+              <div class="tbl-wrap"><table><thead><tr><th>Name</th><th>Role</th><th>Username</th><th>Action</th></tr></thead><tbody id="users-tbody"></tbody></table></div>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="card-title">🔬 Lab Test Prices</span><div class="ml"><button class="btn btn-teal btn-sm" onclick="openModal('modal-add-test')">+ Add</button></div></div>
+              <div class="tbl-wrap"><table><thead><tr><th>Test</th><th>Price</th><th>Action</th></tr></thead><tbody id="tests-tbody"></tbody></table></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">💊 Medicine Inventory</span><div class="ml"><button class="btn btn-teal btn-sm" onclick="openModal('modal-add-med')">+ Add</button></div></div>
+            <div class="tbl-wrap"><table><thead><tr><th>Medicine</th><th>Sale $</th><th>Cost $</th><th>Stock</th><th>Low Alert</th><th>Expiry</th><th>Action</th></tr></thead><tbody id="medicines-tbody"></tbody></table></div>
+          </div>
+          <div class="card">
+            <div class="card-hd"><span class="card-title">📊 Financial Reports (Admin Only)</span></div>
+            <div style="padding:16px">
+              <div class="kpi-row">
+                <div class="kpi teal"><div class="kpi-lbl">Lab Income</div><div class="kpi-val" id="rep-lab-inc">$0</div></div>
+                <div class="kpi blue"><div class="kpi-lbl">Pharmacy Sales</div><div class="kpi-val" id="rep-pharm">$0</div></div>
+                <div class="kpi green"><div class="kpi-lbl">Total Profit</div><div class="kpi-val" id="rep-profit">$0</div></div>
+                <div class="kpi amber"><div class="kpi-lbl">Appointments</div><div class="kpi-val" id="rep-appts">0</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ══ DASHBOARD ══ -->
+        <div class="pg" id="pg-dashboard">
+          <div class="kpi-row">
+            <div class="kpi teal"><div class="kpi-lbl">Today Patients</div><div class="kpi-val" id="d-pts">0</div></div>
+            <div class="kpi amber"><div class="kpi-lbl">Waiting</div><div class="kpi-val" id="d-wait">0</div></div>
+            <div class="kpi blue"><div class="kpi-lbl">Lab Pending</div><div class="kpi-val" id="d-lab">0</div></div>
+            <div class="kpi green"><div class="kpi-lbl">Rx Pending</div><div class="kpi-val" id="d-rx">0</div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="card">
+              <div class="card-hd"><span class="card-title">🕐 Recent Queue</span></div>
+              <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Patient</th><th>Doctor</th><th>Status</th></tr></thead><tbody id="dash-queue"></tbody></table></div>
+            </div>
+            <div class="card">
+              <div class="card-hd"><span class="card-title">🔍 Recent Transfers</span></div>
+              <div style="padding:12px" id="dash-transfers"><div style="color:var(--muted);font-size:12px;text-align:center">No transfers yet.</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PATIENT PANEL ══ -->
+<div class="panel-bg" id="patient-panel-bg" onclick="closePanelBg(event)">
+  <div class="panel">
+    <div class="panel-hd">
+      <button class="panel-close" onclick="closePanel()">✕</button>
+      <h2 id="pp-name">Patient</h2>
+      <p id="pp-sub">—</p>
+    </div>
+    <div class="panel-acts" id="pp-acts"></div>
+    <div class="panel-body">
+      <div class="ig">
+        <div class="ig-item"><label>Age</label><span id="pp-age">—</span></div>
+        <div class="ig-item"><label>District</label><span id="pp-dist">—</span></div>
+        <div class="ig-item"><label>Phone</label><span id="pp-phone">—</span></div>
+        <div class="ig-item"><label>Type</label><span id="pp-type">—</span></div>
+        <div class="ig-item"><label>Assigned Doctor</label><span id="pp-doctor">—</span></div>
+        <div class="ig-item"><label>Registered By</label><span id="pp-regby">—</span></div>
+      </div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchPTab(this,'ppt-history')">📜 History</div>
+        <div class="tab" onclick="switchPTab(this,'ppt-consult')">🩺 Consult</div>
+        <div class="tab" onclick="switchPTab(this,'ppt-lab')">🧪 Lab</div>
+        <div class="tab" onclick="switchPTab(this,'ppt-rx')">💊 Rx</div>
+        <div class="tab" onclick="switchPTab(this,'ppt-track')">🔍 Tracking</div>
+      </div>
+      <div class="tab-pane active" id="ppt-history">
+        <div class="sec-lbl">📋 Medical History</div>
+        <div id="pp-history-content" style="font-size:12px;color:var(--muted)">No previous records.</div>
+      </div>
+      <div class="tab-pane" id="ppt-consult">
+        <div class="sec-lbl">🩺 Today's Consultation</div>
+        <div class="fg"><label>Symptoms</label><textarea id="cons-symptoms" placeholder="Describe patient symptoms..."></textarea></div>
+        <div class="fg"><label>Diagnosis</label><textarea id="cons-diagnosis" placeholder="Enter diagnosis..."></textarea></div>
+        <div class="fg"><label>Notes</label><textarea id="cons-notes" placeholder="Additional notes..."></textarea></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-teal btn-sm" onclick="saveConsultation()">💾 Save</button>
+          <button class="btn btn-blue btn-sm" onclick="openLabRequest()">🧪 Request Lab</button>
+          <button class="btn btn-purple btn-sm" onclick="openRxModal()">💊 Prescribe</button>
+          <button class="btn btn-ghost btn-sm" onclick="printDoctorReport()">🖨️ Print (Doctor)</button>
+        </div>
+      </div>
+      <div class="tab-pane" id="ppt-lab">
+        <div class="sec-lbl">🔬 Lab Results</div>
+        <div id="pp-lab-results" style="font-size:12px;color:var(--muted)">No lab results yet.</div>
+      </div>
+      <div class="tab-pane" id="ppt-rx">
+        <div class="sec-lbl">💊 Prescription</div>
+        <div id="pp-rx-content" style="font-size:12px;color:var(--muted)">No prescription yet.</div>
+        <div id="pp-rx-actions" style="margin-top:10px;display:none;gap:7px;flex-wrap:wrap">
+          <button class="btn btn-green btn-sm" onclick="sendToPharmacy()">→ Send to Pharmacy</button>
+          <button class="btn btn-ghost btn-sm" onclick="printDoctorRx()">🖨️ Print Rx (Doctor)</button>
+        </div>
+      </div>
+      <div class="tab-pane" id="ppt-track">
+        <div class="sec-lbl">🔍 Transfer Tracking</div>
+        <div id="pp-track-content" style="font-size:12px;color:var(--muted)">No transfers for this patient.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALS ══ -->
+<!-- Lab Request -->
+<div class="modal-bg" id="modal-lab-req">
+  <div class="modal narrow">
+    <div class="modal-title">🧪 Request Lab Test</div>
+    <div class="fg"><label>Select Test</label><select id="lab-req-test" onchange="updateLabPrice()"></select></div>
+    <div id="lab-req-price" style="font-size:13px;font-weight:700;color:var(--c1);margin:6px 0"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lab-req')">Cancel</button>
+      <button class="btn btn-teal" onclick="submitLabRequest()">✓ Send to Cashier</button>
+    </div>
+  </div>
+</div>
+
+<!-- Prescription -->
+<div class="modal-bg" id="modal-rx">
+  <div class="modal wide">
+    <div class="modal-title">💊 Write Prescription</div>
+    <div id="rx-lines"></div>
+    <button class="btn btn-ghost btn-sm" onclick="addRxLine()" style="margin-bottom:12px">＋ Add Medicine</button>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-rx')">Cancel</button>
+      <button class="btn btn-teal" onclick="saveRx()">✓ Save Prescription</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lab Result -->
+<div class="modal-bg" id="modal-lab-result">
+  <div class="modal narrow">
+    <div class="modal-title">🔬 Enter Lab Result</div>
+    <div class="ig-item" style="margin-bottom:12px"><label>Patient</label><span id="lr-patient" style="font-size:14px;font-weight:700"></span></div>
+    <div class="ig-item" style="margin-bottom:12px"><label>Test</label><span id="lr-test" style="font-size:14px;font-weight:700"></span></div>
+    <div class="ig-item" style="margin-bottom:12px"><label>Sending Result To</label><span id="lr-doctor" style="font-size:13px;font-weight:700;color:var(--c1)"></span></div>
+    <div class="fg"><label>Result</label><textarea id="lr-result" placeholder="Enter test results here..."></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-lab-result')">Cancel</button>
+      <button class="btn btn-teal" onclick="submitLabResult()">✓ Submit & Send to Doctor</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add User -->
+<div class="modal-bg" id="modal-add-user">
+  <div class="modal narrow">
+    <div class="modal-title">👤 Add Staff User</div>
+    <div class="fg"><label>Full Name</label><input id="usr-name" placeholder="Full name"></div>
+    <div class="fg"><label>Role</label>
+      <select id="usr-role">
+        <option value="cashier">Cashier</option>
+        <option value="doctor">Doctor</option>
+        <option value="lab">Lab Staff</option>
+        <option value="pharmacy">Pharmacy</option>
+        <option value="nurse">Nurse</option>
+      </select>
+    </div>
+    <div class="fg"><label>Username</label><input id="usr-uname" placeholder="Login username"></div>
+    <div class="fg"><label>Password</label><input type="password" id="usr-pass" placeholder="Password"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-user')">Cancel</button>
+      <button class="btn btn-teal" onclick="addUser()">✓ Add User</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Test -->
+<div class="modal-bg" id="modal-add-test">
+  <div class="modal narrow">
+    <div class="modal-title">🔬 Add Lab Test</div>
+    <div class="fg"><label>Test Name</label><input id="tst-name" placeholder="e.g. CBC, Malaria..."></div>
+    <div class="fg"><label>Price ($)</label><input id="tst-price" type="number" min="0"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-test')">Cancel</button>
+      <button class="btn btn-teal" onclick="addTest()">✓ Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Test -->
+<div class="modal-bg" id="modal-edit-test">
+  <div class="modal narrow">
+    <div class="modal-title">🔬 Edit Lab Test</div>
+    <div class="fg"><label>Test Name</label><input id="edit-test-name"></div>
+    <div class="fg"><label>Price ($)</label><input id="edit-test-price" type="number" min="0"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-test')">Cancel</button>
+      <button class="btn btn-teal" onclick="updateTest()">✓ Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Medicine -->
+<div class="modal-bg" id="modal-add-med">
+  <div class="modal">
+    <div class="modal-title">💊 Add Medicine</div>
+    <div class="fg"><label>Medicine Name *</label><input id="med-name" placeholder="e.g. Amoxicillin 500mg"></div>
+    <div class="fgrid">
+      <div class="fg"><label>Sale Price ($)</label><input id="med-price" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="fg"><label>Cost Price ($)</label><input id="med-cost" type="number" min="0" step="0.01" placeholder="0.00"></div>
+      <div class="fg"><label>Initial Stock</label><input id="med-stock" type="number" min="0" placeholder="0"></div>
+      <div class="fg"><label>Low Stock Alert</label><input id="med-low" type="number" min="0" placeholder="10"></div>
+    </div>
+    <div class="fg"><label>Expiry Date</label><input id="med-expiry" type="date"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-add-med')">Cancel</button>
+      <button class="btn btn-teal" onclick="addMed()">✓ Add Medicine</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Medicine -->
+<div class="modal-bg" id="modal-edit-med">
+  <div class="modal">
+    <div class="modal-title">💊 Edit Medicine</div>
+    <div class="fg"><label>Medicine Name</label><input id="edit-med-name"></div>
+    <div class="fgrid">
+      <div class="fg"><label>Sale Price ($)</label><input id="edit-med-price" type="number" step="0.01" min="0"></div>
+      <div class="fg"><label>Cost Price ($)</label><input id="edit-med-cost" type="number" step="0.01" min="0"></div>
+      <div class="fg"><label>Stock</label><input id="edit-med-stock" type="number" min="0"></div>
+      <div class="fg"><label>Low Alert</label><input id="edit-med-low" type="number" min="0"></div>
+    </div>
+    <div class="fg"><label>Expiry Date</label><input id="edit-med-expiry" type="date"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-edit-med')">Cancel</button>
+      <button class="btn btn-teal" onclick="updateMed()">✓ Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- Credit Customer -->
+<div class="modal-bg" id="modal-credit-customer">
+  <div class="modal narrow">
+    <div class="modal-title">👤 Add Credit Customer</div>
+    <div class="fg"><label>Full Name</label><input id="cc-name" placeholder="Customer name"></div>
+    <div class="fg"><label>Phone</label><input id="cc-phone" placeholder="06XXXXXXXX"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-credit-customer')">Cancel</button>
+      <button class="btn btn-teal" onclick="addCreditCustomer()">✓ Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Record Payment -->
+<div class="modal-bg" id="modal-record-payment">
+  <div class="modal narrow">
+    <div class="modal-title">💰 Record Payment</div>
+    <div class="fg"><label>Customer</label><select id="pay-customer"></select></div>
+    <div class="fg"><label>Amount ($)</label><input id="pay-amount" type="number" min="0" step="0.01" placeholder="0.00"></div>
+    <div class="fg"><label>Method</label>
+      <select id="pay-method">
+        <option>💵 Cash</option>
+        <option>📱 EVC Plus</option>
+        <option>🏦 Bank Transfer</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-record-payment')">Cancel</button>
+      <button class="btn btn-green" onclick="recordPayment()">✓ Record</button>
+    </div>
+  </div>
+</div>
+
+<!-- Return -->
+<div class="modal-bg" id="modal-return">
+  <div class="modal narrow">
+    <div class="modal-title">↩️ Record Return</div>
+    <div class="fg"><label>Medicine</label><select id="ret-med"></select></div>
+    <div class="fg"><label>Quantity</label><input id="ret-qty" type="number" min="1" value="1"></div>
+    <div class="fg"><label>Reason</label>
+      <select id="ret-reason">
+        <option>Wrong medicine</option>
+        <option>Patient reaction</option>
+        <option>Expired item</option>
+        <option>Damaged</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('modal-return')">Cancel</button>
+      <button class="btn btn-amber" onclick="recordReturn()">✓ Record Return</button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden print iframe -->
+<iframe id="print-frame" style="display:none;width:0;height:0;border:none" title=" "></iframe>
+<div class="toast" id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════
+//  STATE
+// ════════════════════════════════════════════════
+let currentRole = '';
+let currentUser = null;
+let currentPatientId = null;
+let currentLabReqId = null;
+let currentEditTestId = null;
+let currentEditMedId = null;
+let salesChartInstance = null;
+let selRoleVal = 'cashier';
+
+const DB = {
+  patients: [],
+  labTests: [
+    {id:1,name:'CBC (Complete Blood Count)',price:5},
+    {id:2,name:'Malaria Test',price:3},
+    {id:3,name:'Blood Sugar',price:4},
+    {id:4,name:'Urine Analysis',price:3},
+    {id:5,name:'Liver Function',price:8},
+    {id:6,name:'Kidney Function',price:8},
+  ],
+  medicines: [
+    {id:1,name:'Paracetamol 500mg',price:0.5,cost:0.2,stock:200,lowAlert:20,expiry:'2026-12-10'},
+    {id:2,name:'Amoxicillin 500mg',price:1.2,cost:0.5,stock:150,lowAlert:10,expiry:'2025-12-31'},
+    {id:3,name:'Augmentin 625mg',price:2.5,cost:1.1,stock:8,lowAlert:10,expiry:'2026-07-10'},
+    {id:4,name:'Prednisolone 5mg',price:0.8,cost:0.35,stock:100,lowAlert:15,expiry:'2025-11-05'},
+    {id:5,name:'Metronidazole 400mg',price:0.7,cost:0.28,stock:120,lowAlert:15,expiry:'2026-05-28'},
+    {id:6,name:'ORS Sachet',price:0.3,cost:0.12,stock:300,lowAlert:30,expiry:'2027-02-14'},
+    {id:7,name:'Ibuprofen 400mg',price:0.6,cost:0.24,stock:90,lowAlert:20,expiry:'2026-06-30'},
+  ],
+  users: [
+    {id:1,name:'Dr. Hassan Omar',role:'doctor',username:'hassan',password:'pass123'},
+    {id:2,name:'Dr. Fadumo Ahmed',role:'doctor',username:'fadumo',password:'pass123'},
+    {id:3,name:'Dr. Ali Warsame',role:'doctor',username:'ali_doc',password:'pass123'},
+    {id:4,name:'Ali Cashier',role:'cashier',username:'ali',password:'pass123'},
+    {id:5,name:'Lab Tech Abdi',role:'lab',username:'abdi',password:'pass123'},
+    {id:6,name:'Pharmacy Staff Hibo',role:'pharmacy',username:'pharmacy',password:'pass123'},
+    {id:7,name:'Admin',role:'admin',username:'admin',password:'admin123'},
+    {id:8,name:'Nurse Amina',role:'nurse',username:'nurse',password:'pass123'},
+  ],
+  labRequests: [],
+  prescriptions: [],
+  creditAccounts: [
+    {id:1,name:'Khadija Yusuf',phone:'0612345678',totalCredit:120,paid:40,remaining:80,history:[]},
+    {id:2,name:'Ahmed Nur',phone:'0619876543',totalCredit:95,paid:20,remaining:75,history:[]},
+  ],
+  transactions: [],
+  returns: [],
+  transferLog: [],   // {id, time, from, to, type, patientId, patientName, detail, status}
+  notifications: [],
+  queueCounter: 0,
+  income: {lab:0,pharmacy:0},
+};
+
+// ════════════════════════════════════════════════
+//  ROLE CONFIG
+// ════════════════════════════════════════════════
+const ROLES = {
+  admin:{label:'Admin',nav:['pg-dashboard','pg-registration','pg-waiting','pg-lab-payment','pg-lab','pg-pharmacy','pg-tracking','pg-admin'],labels:['Dashboard','Registration','Waiting','Lab Pay','Lab','Pharmacy','Tracking','Admin'],icons:['📊','📋','🩺','💵','🧪','💊','🔍','⚙️'],default:'pg-dashboard'},
+  cashier:{label:'Cashier',nav:['pg-registration','pg-lab-payment'],labels:['Registration','Lab Payment'],icons:['📋','💵'],default:'pg-registration'},
+  doctor:{label:'Doctor',nav:['pg-waiting'],labels:['My Patients'],icons:['🩺'],default:'pg-waiting'},
+  lab:{label:'Lab',nav:['pg-lab'],labels:['Lab Tests'],icons:['🧪'],default:'pg-lab'},
+  pharmacy:{label:'Pharmacy',nav:['pg-pharmacy'],labels:['Pharmacy'],icons:['💊'],default:'pg-pharmacy'},
+  nurse:{label:'Nurse',nav:['pg-waiting','pg-registration'],labels:['Patients','Registration'],icons:['💉','📋'],default:'pg-waiting'},
+};
+
+function selRole(el, r){ document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('sel')); el.classList.add('sel'); selRoleVal=r; }
+
+function login(){
+  const u=v('login-u'), p=v('login-p');
+  if(!u||!p){toast('⚠️ Enter username and password','error');return;}
+  const user=DB.users.find(x=>x.username===u&&x.password===p);
+  if(!user){toast('⚠️ Invalid credentials','error');return;}
+  if(user.role!==selRoleVal){toast('⚠️ Role mismatch — select your correct role','error');return;}
+  currentUser=user; currentRole=user.role;
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').classList.add('visible');
+  document.getElementById('role-label').textContent=ROLES[currentRole].label;
+  document.getElementById('user-badge').textContent=currentUser.name;
+  document.getElementById('current-user-bar').textContent='Logged in: '+currentUser.name;
+  buildNav(); buildSidebar();
+  populateDoctorDropdown();
+  showPage(ROLES[currentRole].default);
+  logTransfer('System','System',currentUser.name,'Login','User logged in as '+ROLES[currentRole].label,'active');
+}
+
+function logout(){
+  logTransfer('System','System',currentUser.name,'Logout','User logged out','done');
+  currentUser=null; currentRole='';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app').classList.remove('visible');
+}
+
+function populateDoctorDropdown(){
+  const sel=document.getElementById('r-doctor');
+  if(!sel) return;
+  const doctors=DB.users.filter(u=>u.role==='doctor');
+  sel.innerHTML='<option value="">— Select Doctor —</option>'+doctors.map(d=>`<option value="${d.name}">${d.name}</option>`).join('');
+}
+
+function buildNav(){
+  const cfg=ROLES[currentRole];
+  document.getElementById('top-nav').innerHTML=cfg.nav.map((pg,i)=>
+    `<button class="top-nav-btn" onclick="showPage('${pg}')" data-pg="${pg}">${cfg.icons[i]} ${cfg.labels[i]}</button>`).join('');
+}
+function buildSidebar(){
+  const cfg=ROLES[currentRole];
+  document.getElementById('sidebar').innerHTML='<div class="sb-sec">Menu</div>'+
+    cfg.nav.map((pg,i)=>`<div class="sb-item" onclick="showPage('${pg}')" data-sb="${pg}"><span class="ic">${cfg.icons[i]}</span>${cfg.labels[i]}</div>`).join('');
+}
+
+function showPage(pgId){
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  const pg=document.getElementById(pgId); if(pg) pg.classList.add('active');
+  document.querySelectorAll('[data-pg],[data-sb]').forEach(b=>{const id=b.dataset.pg||b.dataset.sb;b.classList.toggle('active',id===pgId);});
+  const cfg=ROLES[currentRole]; const idx=cfg.nav.indexOf(pgId);
+  document.getElementById('strip-text').textContent=idx>=0?cfg.labels[idx]:pgId;
+  refreshAll();
+  if(pgId==='pg-pharmacy') setTimeout(renderSalesChart,120);
+}
+
+// ════════════════════════════════════════════════
+//  TRANSFER LOG
+// ════════════════════════════════════════════════
+function logTransfer(from, to, byUser, type, detail, status, patientId=null, patientName=''){
+  const entry={id:Date.now()+Math.random(),time:new Date().toLocaleTimeString('en-GB'),date:new Date().toLocaleDateString('en-GB'),from,to,byUser,type,detail,status,patientId,patientName};
+  DB.transferLog.unshift(entry);
+  // Add notification if it's a patient-related transfer
+  if(patientId){
+    DB.notifications.unshift({id:entry.id,title:`${type}: ${patientName}`,sub:`${from} → ${to} · ${entry.time}`,read:false,patientId});
+    updateNotifBadge();
+  }
+}
+
+function updateNotifBadge(){
+  const unread=DB.notifications.filter(n=>!n.read).length;
+  const dot=document.getElementById('notif-dot');
+  if(dot) dot.style.display=unread>0?'block':'none';
+}
+
+function toggleNotifPanel(){
+  const p=document.getElementById('notif-panel'); p.classList.toggle('open');
+  renderNotifications();
+  DB.notifications.forEach(n=>n.read=true); updateNotifBadge();
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.notif-btn')&&!e.target.closest('.notif-panel')) document.getElementById('notif-panel')?.classList.remove('open');});
+
+function renderNotifications(){
+  const list=document.getElementById('notif-list');
+  if(!list) return;
+  if(!DB.notifications.length){list.innerHTML='<div style="padding:16px;font-size:12px;color:var(--muted);text-align:center">No notifications</div>';return;}
+  list.innerHTML=DB.notifications.slice(0,10).map(n=>`
+    <div class="notif-item ${n.read?'':'unread'}" onclick="openPatientFromNotif(${n.patientId})">
+      <div class="notif-item-title">${n.title}</div>
+      <div class="notif-item-sub">${n.sub}</div>
+    </div>`).join('');
+  document.getElementById('notif-count').textContent=DB.notifications.length>0?`(${DB.notifications.length})`:'';
+}
+
+function openPatientFromNotif(id){
+  document.getElementById('notif-panel').classList.remove('open');
+  if(id) openPatient(id);
+}
+
+// ════════════════════════════════════════════════
+//  REGISTRATION
+// ════════════════════════════════════════════════
+function registerPatient(){
+  const name=v('r-name'),age=v('r-age'),dist=v('r-dist'),phone=v('r-phone'),doctor=v('r-doctor'),type=v('r-type');
+  if(!name||!age||!dist||!phone||!doctor){toast('⚠️ Fill all required fields','error');return;}
+  DB.queueCounter++;
+  const pt={
+    id:Date.now(),name,age,dist,phone,doctor,type,
+    queue:DB.queueCounter,status:'Waiting',
+    date:new Date().toLocaleDateString('en-GB'),
+    time:new Date().toLocaleTimeString('en-GB'),
+    registeredBy:currentUser?.name||'Cashier',
+    consultations:[],labReqs:[],rx:[],
+  };
+  DB.patients.push(pt);
+  ['r-name','r-age','r-dist','r-phone'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('r-doctor').value='';
+  // Log transfer: cashier → doctor
+  logTransfer(currentUser?.name||'Cashier', doctor,'Registration','Patient Registered',`${name} assigned to ${doctor}`,  'active',pt.id,name);
+  printA5Ticket(pt);
+  refreshAll();
+  toast(`✅ Queue #${pt.queue} registered & ticket printed`);
+}
+
+// ════════════════════════════════════════════════
+//  PATIENT PANEL
+// ════════════════════════════════════════════════
+function openPatient(id){
+  const pt=DB.patients.find(p=>p.id===id); if(!pt) return;
+  currentPatientId=id;
+  document.getElementById('pp-name').textContent=pt.name;
+  document.getElementById('pp-sub').textContent=`Queue #${pt.queue} · ${pt.type} · ${pt.date} ${pt.time}`;
+  document.getElementById('pp-age').textContent=pt.age+' Y';
+  document.getElementById('pp-dist').textContent=pt.dist;
+  document.getElementById('pp-phone').textContent=pt.phone;
+  document.getElementById('pp-type').textContent=pt.type;
+  document.getElementById('pp-doctor').textContent=pt.doctor;
+  document.getElementById('pp-regby').textContent=pt.registeredBy||'—';
+
+  // History
+  document.getElementById('pp-history-content').innerHTML=pt.consultations.map(c=>`
+    <div style="background:var(--bg);border-radius:7px;padding:10px;margin-bottom:8px;font-size:11px">
+      <div style="font-weight:700;color:var(--c2);margin-bottom:3px">📅 ${c.date} · ${c.by||''}</div>
+      <div><b>Symptoms:</b> ${c.symptoms}</div>
+      <div><b>Diagnosis:</b> ${c.diagnosis}</div>
+      ${c.notes?`<div><b>Notes:</b> ${c.notes}</div>`:''}</div>`).join('')||'<p style="color:var(--muted);font-size:12px">No previous records.</p>';
+
+  // Lab results
+  const labRs=DB.labRequests.filter(r=>r.patientId===id&&r.result);
+  document.getElementById('pp-lab-results').innerHTML=labRs.length?
+    labRs.map(r=>{const test=DB.labTests.find(t=>t.id===r.testId);
+      return `<div style="background:var(--c1ll);border:1px solid var(--c1l);border-radius:7px;padding:10px;margin-bottom:8px;font-size:11px">
+        <div style="font-weight:700;color:var(--c1)">🔬 ${test?.name||'Test'} <span style="font-size:9px;color:var(--muted)">· Submitted by ${r.submittedBy||'Lab'} · ${r.submittedAt||''}</span></div>
+        <div style="margin-top:5px"><b>Result:</b> ${r.result}</div></div>`;
+    }).join(''):'<p style="color:var(--muted);font-size:12px">No lab results yet.</p>';
+
+  // Prescription
+  const rxs=DB.prescriptions.filter(r=>r.patientId===id);
+  if(rxs.length){
+    const latest=rxs[rxs.length-1];
+    document.getElementById('pp-rx-content').innerHTML=`<div style="font-size:10px;color:var(--muted);margin-bottom:8px">Written by ${latest.doctor} · ${latest.date}</div>`+
+      latest.meds.map(m=>{const med=DB.medicines.find(x=>x.id===m.medId);
+        return `<div style="padding:7px 0;border-bottom:1px solid var(--border);font-size:12px">💊 <b>${med?.name||'Med'}</b> — ${m.dose} | ${m.freq} | ${m.duration}</div>`;
+      }).join('');
+    document.getElementById('pp-rx-actions').style.display='flex';
+  } else {
+    document.getElementById('pp-rx-content').textContent='No prescription yet.';
+    document.getElementById('pp-rx-actions').style.display='none';
+  }
+
+  // Tracking
+  const tracks=DB.transferLog.filter(t=>t.patientId===id);
+  document.getElementById('pp-track-content').innerHTML=tracks.length?
+    tracks.map(t=>`<div class="track-row">
+      <div class="track-dot ${t.type.includes('Lab')?'blue':t.type.includes('Pharmacy')?'amber':''}"></div>
+      <div><div style="font-weight:700">${t.type}</div>
+        <div style="color:var(--muted)">${t.from} → ${t.to}</div>
+        <div style="color:var(--muted);font-size:10px">${t.detail} · ${t.date} ${t.time} · By ${t.byUser}</div></div>
+    </div>`).join(''):'<p style="color:var(--muted);font-size:12px">No transfers for this patient.</p>';
+
+  // Actions
+  const acts=document.getElementById('pp-acts');
+  if(currentRole==='doctor'||currentRole==='admin'){
+    acts.innerHTML=`
+      <button class="btn btn-teal btn-sm" onclick="markSeen()">✓ Mark Seen</button>
+      <button class="btn btn-blue btn-sm" onclick="openLabRequest()">🧪 Lab Test</button>
+      <button class="btn btn-purple btn-sm" onclick="openRxModal()">💊 Prescribe</button>
+      <button class="btn btn-ghost btn-sm" onclick="printDoctorReport()">🖨️ Print</button>`;
+  } else {
+    acts.innerHTML=`<button class="btn btn-ghost btn-sm" onclick="printA5Ticket(DB.patients.find(p=>p.id===${id}))">🖨️ Reprint Ticket</button>`;
+  }
+  document.getElementById('patient-panel-bg').classList.add('open');
+}
+
+function closePanel(){document.getElementById('patient-panel-bg').classList.remove('open');}
+function closePanelBg(e){if(e.target===document.getElementById('patient-panel-bg'))closePanel();}
+
+function markSeen(){
+  const pt=DB.patients.find(p=>p.id===currentPatientId);
+  if(pt){pt.status='Seen';refreshAll();toast('✅ Marked as Seen');}
+}
+function saveConsultation(){
+  const pt=DB.patients.find(p=>p.id===currentPatientId); if(!pt) return;
+  const symp=document.getElementById('cons-symptoms').value;
+  const diag=document.getElementById('cons-diagnosis').value;
+  const notes=document.getElementById('cons-notes').value;
+  if(!symp&&!diag){toast('⚠️ Enter symptoms or diagnosis','error');return;}
+  pt.consultations.push({date:new Date().toLocaleDateString('en-GB'),by:currentUser?.name,symptoms:symp,diagnosis:diag,notes});
+  ['cons-symptoms','cons-diagnosis','cons-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  toast('💾 Consultation saved');
+  openPatient(currentPatientId);
+}
+
+// ════════════════════════════════════════════════
+//  LAB
+// ════════════════════════════════════════════════
+function openLabRequest(){
+  const sel=document.getElementById('lab-req-test');
+  sel.innerHTML=DB.labTests.map(t=>`<option value="${t.id}">${t.name} — $${t.price}</option>`).join('');
+  updateLabPrice(); openModal('modal-lab-req');
+}
+function updateLabPrice(){
+  const sel=document.getElementById('lab-req-test');
+  const t=DB.labTests.find(x=>x.id===parseInt(sel.value));
+  document.getElementById('lab-req-price').textContent=t?`Price: $${t.price}`:'';
+}
+function submitLabRequest(){
+  const testId=parseInt(document.getElementById('lab-req-test').value);
+  if(!currentPatientId||!testId) return;
+  const pt=DB.patients.find(p=>p.id===currentPatientId);
+  const test=DB.labTests.find(t=>t.id===testId);
+  const req={id:Date.now(),patientId:currentPatientId,testId,status:'pending',result:'',
+    requestedBy:currentUser?.name,requestedAt:new Date().toLocaleTimeString('en-GB')};
+  DB.labRequests.push(req);
+  logTransfer(currentUser?.name||'Doctor','Cashier/Lab','Lab Request',`Lab: ${test?.name}`,'Lab test requested — awaiting payment','pending',currentPatientId,pt?.name||'Patient');
+  closeModal('modal-lab-req'); refreshAll();
+  toast('🧪 Lab request sent to Cashier for payment');
+}
+function confirmLabPayment(reqId){
+  const req=DB.labRequests.find(r=>r.id===reqId); if(!req) return;
+  req.status='paid'; req.paidBy=currentUser?.name; req.paidAt=new Date().toLocaleTimeString('en-GB');
+  const test=DB.labTests.find(t=>t.id===req.testId);
+  const pt=DB.patients.find(p=>p.id===req.patientId);
+  DB.income.lab+=test?.price||0;
+  logTransfer('Cashier','Lab','Payment Confirmed',`$${test?.price||0} paid for ${test?.name}`,'Lab payment confirmed','active',req.patientId,pt?.name||'Patient');
+  refreshAll(); toast(`✅ Payment $${test?.price||0} confirmed — forwarded to Lab`);
+}
+function openLabResult(reqId){
+  const req=DB.labRequests.find(r=>r.id===reqId);
+  const pt=DB.patients.find(p=>p.id===req.patientId);
+  const test=DB.labTests.find(t=>t.id===req.testId);
+  currentLabReqId=reqId;
+  document.getElementById('lr-patient').textContent=pt?.name||'';
+  document.getElementById('lr-test').textContent=test?.name||'';
+  document.getElementById('lr-doctor').textContent=pt?.doctor||'Assigned Doctor';
+  document.getElementById('lr-result').value='';
+  openModal('modal-lab-result');
+}
+function submitLabResult(){
+  const result=document.getElementById('lr-result').value;
+  if(!result){toast('⚠️ Enter result','error');return;}
+  const req=DB.labRequests.find(r=>r.id===currentLabReqId);
+  if(req){
+    req.result=result; req.status='done';
+    req.submittedBy=currentUser?.name; req.submittedAt=new Date().toLocaleTimeString('en-GB');
+    const pt=DB.patients.find(p=>p.id===req.patientId);
+    logTransfer(currentUser?.name||'Lab',pt?.doctor||'Doctor','Lab Result Submitted',`Result for ${DB.labTests.find(t=>t.id===req.testId)?.name} sent to doctor`,'Result submitted','done',req.patientId,pt?.name||'Patient');
+  }
+  closeModal('modal-lab-result'); refreshAll();
+  toast('✅ Result submitted and sent to Doctor');
+}
+
+// ════════════════════════════════════════════════
+//  PRESCRIPTION
+// ════════════════════════════════════════════════
+let rxLines=[];
+function openRxModal(){rxLines=[{medId:'',dose:'',freq:'',duration:''}];renderRxLines();openModal('modal-rx');}
+function renderRxLines(){
+  document.getElementById('rx-lines').innerHTML=rxLines.map((l,i)=>`
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr auto;gap:7px;align-items:end;margin-bottom:9px">
+      <div class="fg" style="margin:0"><label>Medicine</label>
+        <select onchange="rxLines[${i}].medId=parseInt(this.value)">
+          <option value="">— Select —</option>
+          ${DB.medicines.map(m=>`<option value="${m.id}" ${l.medId===m.id?'selected':''}>${m.name}</option>`).join('')}
+        </select></div>
+      <div class="fg" style="margin:0"><label>Dose</label><input placeholder="1 tab" value="${l.dose}" oninput="rxLines[${i}].dose=this.value"></div>
+      <div class="fg" style="margin:0"><label>Frequency</label><input placeholder="3x/day" value="${l.freq}" oninput="rxLines[${i}].freq=this.value"></div>
+      <div class="fg" style="margin:0"><label>Duration</label><input placeholder="5 days" value="${l.duration}" oninput="rxLines[${i}].duration=this.value"></div>
+      <button class="btn btn-red btn-xs" style="margin-bottom:1px" onclick="removeRxLine(${i})">✕</button>
+    </div>`).join('');
+}
+function addRxLine(){rxLines.push({medId:'',dose:'',freq:'',duration:''});renderRxLines();}
+function removeRxLine(i){rxLines.splice(i,1);renderRxLines();}
+function saveRx(){
+  const valid=rxLines.filter(l=>l.medId);
+  if(!valid.length){toast('⚠️ Add at least one medicine','error');return;}
+  const pt=DB.patients.find(p=>p.id===currentPatientId);
+  const rx={id:Date.now(),patientId:currentPatientId,doctor:currentUser?.name||'Doctor',meds:valid,status:'pending',date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB')};
+  DB.prescriptions.push(rx);
+  logTransfer(currentUser?.name||'Doctor','Pharmacy','Prescription Written',`Prescription for ${pt?.name} — ${valid.length} medicine(s)`,'Prescription saved','pending',currentPatientId,pt?.name||'Patient');
+  closeModal('modal-rx'); refreshAll();
+  toast('💊 Prescription saved');
+  openPatient(currentPatientId);
+}
+function sendToPharmacy(){
+  const rxs=DB.prescriptions.filter(r=>r.patientId===currentPatientId&&r.status==='pending');
+  rxs.forEach(r=>r.status='at-pharmacy');
+  const pt=DB.patients.find(p=>p.id===currentPatientId);
+  logTransfer(currentUser?.name||'Doctor','Pharmacy','Prescription Sent to Pharmacy',`Sent for ${pt?.name}`,'Prescription sent','active',currentPatientId,pt?.name||'Patient');
+  refreshAll(); toast('→ Prescription sent to Pharmacy');
+}
+function dispenseRx(rxId){
+  const rx=DB.prescriptions.find(r=>r.id===rxId); if(!rx) return;
+  rx.status='dispensed'; rx.dispensedBy=currentUser?.name; rx.dispensedAt=new Date().toLocaleTimeString('en-GB');
+  let total=0;
+  rx.meds.forEach(m=>{const med=DB.medicines.find(x=>x.id===m.medId);if(med){med.stock=Math.max(0,med.stock-1);total+=med.price;}});
+  DB.income.pharmacy+=total;
+  const pt=DB.patients.find(p=>p.id===rx.patientId);
+  logTransfer('Pharmacy',pt?.name||'Patient','Medicines Dispensed',`$${total.toFixed(2)} worth dispensed`,'Dispensed','done',rx.patientId,pt?.name||'');
+  refreshAll(); toast('✅ Medicines dispensed');
+}
+
+// ════════════════════════════════════════════════
+//  PHARMACY POS
+// ════════════════════════════════════════════════
+function populateSaleMed(){
+  const sel=document.getElementById('sale-med'); if(!sel) return;
+  sel.innerHTML=DB.medicines.map(m=>`<option value="${m.id}">${m.name} (${m.stock} in stock) — $${m.price}</option>`).join('');
+  updateSalePrice();
+}
+function updateSalePrice(){
+  const medId=parseInt(document.getElementById('sale-med')?.value);
+  const med=DB.medicines.find(m=>m.id===medId);
+  if(med){document.getElementById('sale-unit-price').value=med.price;updateSaleTotal();}
+}
+function updateSaleTotal(){
+  const qty=parseFloat(document.getElementById('sale-qty')?.value)||1;
+  const price=parseFloat(document.getElementById('sale-unit-price')?.value)||0;
+  document.getElementById('sale-total').value='$'+(qty*price).toFixed(2);
+}
+function toggleSaleCustomer(){
+  const type=document.getElementById('sale-payment')?.value;
+  const wrap=document.getElementById('sale-customer-wrap');
+  if(wrap) wrap.style.display=type==='credit'?'block':'none';
+  if(type==='credit'){
+    const sel=document.getElementById('sale-customer');
+    if(sel) sel.innerHTML=DB.creditAccounts.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  }
+}
+function addPharmacySale(){
+  const medId=parseInt(document.getElementById('sale-med')?.value);
+  const qty=parseInt(document.getElementById('sale-qty')?.value)||1;
+  const unitPrice=parseFloat(document.getElementById('sale-unit-price')?.value)||0;
+  const payType=document.getElementById('sale-payment')?.value;
+  const med=DB.medicines.find(m=>m.id===medId);
+  if(!med){toast('⚠️ Select medicine','error');return;}
+  if(med.stock<qty){toast(`⚠️ Insufficient stock! Available: ${med.stock}`,'error');return;}
+  med.stock-=qty;
+  const total=unitPrice*qty; const costTotal=(med.cost||0)*qty; const profit=total-costTotal;
+  const tx={id:Date.now(),date:new Date().toLocaleDateString('en-GB'),type:'sale',medId,medName:med.name,qty,price:total,cost:costTotal,profit,paymentType:payType};
+  if(payType==='credit'){
+    const custId=parseInt(document.getElementById('sale-customer')?.value);
+    const cust=DB.creditAccounts.find(c=>c.id===custId);
+    if(cust){cust.totalCredit+=total;cust.remaining+=total;}
+  } else { DB.income.pharmacy+=total; }
+  DB.transactions.push(tx);
+  resetSaleForm(); refreshAll(); renderSalesChart();
+  toast(`✅ Sale: $${total.toFixed(2)} | Profit: $${profit.toFixed(2)}`);
+}
+function resetSaleForm(){
+  const qty=document.getElementById('sale-qty');if(qty)qty.value=1;
+  populateSaleMed();
+  const wrap=document.getElementById('sale-customer-wrap');if(wrap)wrap.style.display='none';
+  const pay=document.getElementById('sale-payment');if(pay)pay.value='cash';
+}
+function addCreditCustomer(){
+  const name=v('cc-name'),phone=v('cc-phone');
+  if(!name){toast('⚠️ Enter name','error');return;}
+  DB.creditAccounts.push({id:Date.now(),name,phone,totalCredit:0,paid:0,remaining:0,history:[]});
+  document.getElementById('cc-name').value='';document.getElementById('cc-phone').value='';
+  closeModal('modal-credit-customer'); refreshAll(); toast('✅ Credit customer added');
+}
+function openRecordPayment(){
+  const sel=document.getElementById('pay-customer');
+  if(sel) sel.innerHTML=DB.creditAccounts.map(c=>`<option value="${c.id}">${c.name} (Owes: $${c.remaining.toFixed(2)})</option>`).join('');
+  document.getElementById('pay-amount').value='';
+  openModal('modal-record-payment');
+}
+function recordPayment(){
+  const custId=parseInt(document.getElementById('pay-customer')?.value);
+  const amount=parseFloat(document.getElementById('pay-amount')?.value)||0;
+  if(!amount){toast('⚠️ Enter amount','error');return;}
+  const cust=DB.creditAccounts.find(c=>c.id===custId);
+  if(cust){cust.paid+=amount;cust.remaining=Math.max(0,cust.remaining-amount);DB.income.pharmacy+=amount;}
+  closeModal('modal-record-payment'); refreshAll(); toast(`✅ $${amount.toFixed(2)} payment recorded`);
+}
+function recordReturn(){
+  const medId=parseInt(document.getElementById('ret-med')?.value);
+  const qty=parseInt(document.getElementById('ret-qty')?.value)||1;
+  const reason=document.getElementById('ret-reason')?.value;
+  const med=DB.medicines.find(m=>m.id===medId); if(!med) return;
+  med.stock+=qty;
+  const refund=med.price*qty;
+  DB.returns.push({id:Date.now(),date:new Date().toLocaleDateString('en-GB'),medId,medName:med.name,qty,reason,refund});
+  closeModal('modal-return'); refreshAll(); toast(`↩️ Return recorded — $${refund.toFixed(2)} refund`);
+}
+
+// ════════════════════════════════════════════════
+//  ADMIN
+// ════════════════════════════════════════════════
+function addUser(){
+  const name=v('usr-name'),role2=v('usr-role'),username=v('usr-uname'),password=v('usr-pass');
+  if(!name||!username||!password){toast('⚠️ Fill all fields','error');return;}
+  DB.users.push({id:Date.now(),name,role:role2,username,password});
+  closeModal('modal-add-user'); refreshAll(); toast('✅ User added');
+}
+function removeUser(index){
+  if(confirm('Remove this user?')){DB.users.splice(index,1);refreshAll();toast('✅ User removed');}
+}
+function addTest(){
+  const name=v('tst-name'),price=parseFloat(v('tst-price'))||0;
+  if(!name){toast('⚠️ Enter test name','error');return;}
+  DB.labTests.push({id:Date.now(),name,price});
+  closeModal('modal-add-test'); refreshAll(); toast('✅ Lab test added');
+}
+function editTest(i){
+  currentEditTestId=i;
+  document.getElementById('edit-test-name').value=DB.labTests[i].name;
+  document.getElementById('edit-test-price').value=DB.labTests[i].price;
+  openModal('modal-edit-test');
+}
+function updateTest(){
+  const name=v('edit-test-name'),price=parseFloat(v('edit-test-price'))||0;
+  if(!name){toast('⚠️ Enter name','error');return;}
+  DB.labTests[currentEditTestId]={...DB.labTests[currentEditTestId],name,price};
+  closeModal('modal-edit-test'); refreshAll(); toast('✅ Test updated');
+}
+function addMed(){
+  const name=v('med-name'); if(!name){toast('⚠️ Enter name','error');return;}
+  DB.medicines.push({id:Date.now(),name,price:parseFloat(v('med-price'))||0,cost:parseFloat(v('med-cost'))||0,stock:parseInt(v('med-stock'))||0,lowAlert:parseInt(v('med-low'))||10,expiry:v('med-expiry')});
+  closeModal('modal-add-med'); refreshAll(); toast('✅ Medicine added');
+}
+function editMed(i){
+  currentEditMedId=i; const m=DB.medicines[i];
+  document.getElementById('edit-med-name').value=m.name;
+  document.getElementById('edit-med-price').value=m.price;
+  document.getElementById('edit-med-cost').value=m.cost||0;
+  document.getElementById('edit-med-stock').value=m.stock;
+  document.getElementById('edit-med-low').value=m.lowAlert||10;
+  document.getElementById('edit-med-expiry').value=m.expiry||'';
+  openModal('modal-edit-med');
+}
+function updateMed(){
+  const name=v('edit-med-name'); if(!name){toast('⚠️ Enter name','error');return;}
+  DB.medicines[currentEditMedId]={...DB.medicines[currentEditMedId],name,price:parseFloat(v('edit-med-price'))||0,cost:parseFloat(v('edit-med-cost'))||0,stock:parseInt(v('edit-med-stock'))||0,lowAlert:parseInt(v('edit-med-low'))||10,expiry:v('edit-med-expiry')};
+  closeModal('modal-edit-med'); refreshAll(); toast('✅ Medicine updated');
+}
+
+// ════════════════════════════════════════════════
+//  MEDICINE STATUS
+// ════════════════════════════════════════════════
+function getMedStatus(med){
+  if(!med.expiry) return {label:'OK',cls:'b-done',expired:false,soon:false};
+  const today=new Date(); today.setHours(0,0,0,0);
+  const exp=new Date(med.expiry);
+  const diff=Math.ceil((exp-today)/(1000*60*60*24));
+  if(diff<0) return {label:'EXPIRED',cls:'b-cancel',expired:true,soon:false};
+  if(diff<=30) return {label:`${diff}d left`,cls:'b-wait',expired:false,soon:true};
+  return {label:'OK',cls:'b-done',expired:false,soon:false};
+}
+
+// ════════════════════════════════════════════════
+//  SALES CHART
+// ════════════════════════════════════════════════
+function renderSalesChart(){
+  const ctx=document.getElementById('sales-chart'); if(!ctx) return;
+  const today=new Date();
+  const labels=[],data=[];
+  for(let i=13;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const dStr=d.toLocaleDateString('en-GB');
+    labels.push(d.toLocaleDateString('en-GB',{month:'short',day:'numeric'}));
+    data.push(DB.transactions.filter(t=>t.date===dStr&&t.type==='sale').reduce((s,t)=>s+t.price,0));
+  }
+  if(salesChartInstance) salesChartInstance.destroy();
+  salesChartInstance=new Chart(ctx,{type:'line',data:{labels,datasets:[{label:'Sales ($)',data,borderColor:'#0f766e',backgroundColor:'rgba(15,118,110,.08)',borderWidth:2,fill:true,tension:.4,pointBackgroundColor:'#0f766e',pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>'$'+v,font:{size:9}}},x:{ticks:{font:{size:9}}}}}});
+}
+
+function renderTopSold(){
+  const wrap=document.getElementById('top-sold-wrap'); if(!wrap) return;
+  if(!DB.transactions.length){wrap.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:14px">No sales yet.</div>';return;}
+  const counts={};
+  DB.transactions.filter(t=>t.type==='sale').forEach(t=>counts[t.medName]=(counts[t.medName]||0)+t.qty);
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const max=sorted[0]?.[1]||1;
+  wrap.innerHTML=sorted.map(([name,qty])=>`
+    <div class="top-sold-item"><div style="flex:1">
+      <div style="font-weight:600;font-size:11px">${name}</div>
+      <div class="top-sold-bar"><div class="top-sold-bar-fill" style="width:${(qty/max*100).toFixed(0)}%"></div></div>
+    </div><div style="font-weight:700;color:var(--c1);font-size:12px;margin-left:8px">${qty}</div></div>`).join('');
+}
+
+function renderAlerts(){
+  const wrap=document.getElementById('ph-alerts-wrap'); if(!wrap) return;
+  let html='';
+  DB.medicines.forEach(m=>{
+    const st=getMedStatus(m);
+    if(st.expired) html+=`<div class="alert-banner">🚫 <b>${m.name}</b> has EXPIRED (${m.expiry}). Remove immediately.</div>`;
+    else if(st.soon) html+=`<div class="alert-banner amber">⚠️ <b>${m.name}</b> expiring soon (${m.expiry}).</div>`;
+    if(m.lowAlert&&m.stock<=m.lowAlert&&m.stock>0) html+=`<div class="alert-banner amber">📉 <b>${m.name}</b> low stock: ${m.stock} units (alert at ${m.lowAlert}).</div>`;
+    if(m.stock<=0) html+=`<div class="alert-banner">📦 <b>${m.name}</b> is OUT OF STOCK.</div>`;
+  });
+  wrap.innerHTML=html;
+}
+
+// ════════════════════════════════════════════════
+//  REFRESH ALL
+// ════════════════════════════════════════════════
+function refreshAll(){
+  refreshKPIs();
+  renderQueue();
+  renderWaiting();
+  renderLabPayment();
+  renderLab();
+  renderPharmacy();
+  renderAdmin();
+  renderDashboard();
+  renderTracking();
+  renderTopSold();
+  renderAlerts();
+}
+
+function refreshKPIs(){
+  const today=DB.patients;
+  sv('kpi-today',today.length);
+  sv('kpi-queue','#'+(DB.queueCounter+1));
+  sv('kpi-new',today.filter(p=>p.type==='New').length);
+  sv('kpi-follow',today.filter(p=>p.type==='Follow-Up').length);
+  // Doctor-specific: only show their patients
+  const myPts=currentRole==='doctor'?today.filter(p=>p.doctor===currentUser?.name):today;
+  sv('kpi-waiting',myPts.filter(p=>p.status==='Waiting').length);
+  sv('kpi-seen',myPts.filter(p=>p.status==='Seen').length);
+  sv('kpi-lab-pend',DB.labRequests.filter(r=>r.status==='paid').length);
+  sv('kpi-total-pts',today.length);
+  sv('kpi-income','$'+(DB.income.lab+DB.income.pharmacy).toFixed(2));
+  sv('kpi-lab-today',DB.labRequests.filter(r=>r.status==='done').length);
+  sv('kpi-rx-today',DB.prescriptions.length);
+  sv('rep-lab-inc','$'+DB.income.lab.toFixed(2));
+  sv('rep-pharm','$'+DB.income.pharmacy.toFixed(2));
+  sv('rep-profit','$'+DB.transactions.filter(t=>t.type==='sale').reduce((s,t)=>s+(t.profit||0),0).toFixed(2));
+  sv('rep-appts',today.length);
+
+  const todayStr=new Date().toLocaleDateString('en-GB');
+  const weekAgo=new Date(); weekAgo.setDate(weekAgo.getDate()-7);
+  const monthAgo=new Date(); monthAgo.setDate(monthAgo.getDate()-30);
+  const parseDate=s=>{const [d,m,y]=s.split('/');return new Date(y,m-1,d);};
+  sv('ph-today-sales','$'+DB.transactions.filter(t=>t.date===todayStr&&t.type==='sale').reduce((s,t)=>s+t.price,0).toFixed(2));
+  sv('ph-week-sales','$'+DB.transactions.filter(t=>t.type==='sale'&&parseDate(t.date)>=weekAgo).reduce((s,t)=>s+t.price,0).toFixed(2));
+  sv('ph-month-sales','$'+DB.transactions.filter(t=>t.type==='sale'&&parseDate(t.date)>=monthAgo).reduce((s,t)=>s+t.price,0).toFixed(2));
+  sv('ph-total-profit','$'+DB.transactions.filter(t=>t.type==='sale').reduce((s,t)=>s+(t.profit||0),0).toFixed(2));
+  sv('ph-total-products',DB.medicines.length);
+  sv('ph-low-stock',DB.medicines.filter(m=>m.lowAlert&&m.stock<=m.lowAlert).length);
+  sv('ph-expired-count',DB.medicines.filter(m=>getMedStatus(m).expired).length);
+  sv('ph-credit-amount','$'+DB.creditAccounts.reduce((s,c)=>s+c.remaining,0).toFixed(2));
+
+  sv('d-pts',today.length);
+  sv('d-wait',today.filter(p=>p.status==='Waiting').length);
+  sv('d-lab',DB.labRequests.filter(r=>r.status==='paid').length);
+  sv('d-rx',DB.prescriptions.filter(r=>r.status==='at-pharmacy').length);
+}
+
+function renderQueue(){
+  const tbody=document.getElementById('queue-tbody'); if(!tbody) return;
+  tbody.innerHTML=DB.patients.map((pt,i)=>{
+    const lastTransfer=DB.transferLog.filter(t=>t.patientId===pt.id).slice(-1)[0];
+    return `<tr onclick="openPatient(${pt.id})">
+      <td>${i+1}</td>
+      <td><b class="mono" style="font-size:17px;color:var(--c1)">${pt.queue}</b></td>
+      <td><b>${pt.name}</b><div style="font-size:9px;color:var(--muted)">By: ${pt.registeredBy}</div></td>
+      <td>${pt.age}Y</td>
+      <td>${pt.dist}</td>
+      <td>${pt.doctor}</td>
+      <td><span class="badge ${pt.type==='New'?'b-new':'b-follow'}">${pt.type}</span></td>
+      <td><span class="badge ${pt.status==='Waiting'?'b-wait':'b-done'}">${pt.status}</span></td>
+      <td style="font-size:10px;color:var(--muted)">${lastTransfer?lastTransfer.to:'—'}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();printA5Ticket(DB.patients.find(p=>p.id===${pt.id}))">🖨️</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:18px">No patients today</td></tr>';
+}
+
+function renderWaiting(){
+  const tbody=document.getElementById('waiting-tbody'); if(!tbody) return;
+  // Doctor only sees their own patients
+  const pts=currentRole==='doctor'?DB.patients.filter(p=>p.doctor===currentUser?.name):DB.patients;
+  tbody.innerHTML=pts.map(pt=>{
+    const transfer=DB.transferLog.filter(t=>t.patientId===pt.id&&t.type==='Patient Registered').slice(-1)[0];
+    return `<tr onclick="openPatient(${pt.id})">
+      <td><b class="mono" style="font-size:20px;color:var(--c1)">${pt.queue}</b></td>
+      <td><b>${pt.name}</b></td>
+      <td>${pt.age}Y</td>
+      <td><span class="badge ${pt.type==='New'?'b-new':'b-follow'}">${pt.type}</span></td>
+      <td>${pt.dist}</td>
+      <td style="font-size:10px;color:var(--muted)">${transfer?.byUser||pt.registeredBy||'—'}</td>
+      <td style="font-size:10px;color:var(--muted)">${pt.time||'—'}</td>
+      <td><span class="badge ${pt.status==='Waiting'?'b-wait':'b-done'}">${pt.status}</span></td>
+      <td><button class="btn btn-teal btn-sm" onclick="event.stopPropagation();openPatient(${pt.id})">Open File</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="9" style="text-align:center;color:var(--muted);padding:18px">No patients in queue</td></tr>';
+}
+
+function renderLabPayment(){
+  const tbody=document.getElementById('lab-payment-tbody'); if(!tbody) return;
+  const pending=DB.labRequests.filter(r=>r.status==='pending');
+  tbody.innerHTML=pending.map(req=>{
+    const pt=DB.patients.find(p=>p.id===req.patientId);
+    const test=DB.labTests.find(t=>t.id===req.testId);
+    return `<tr>
+      <td><b>${pt?.name||'—'}</b></td>
+      <td>${test?.name||'—'}</td>
+      <td style="font-size:10px;color:var(--muted)">${req.requestedBy||'Doctor'}</td>
+      <td><b style="color:var(--c1)">$${test?.price||0}</b></td>
+      <td><span class="badge b-wait">Awaiting Payment</span></td>
+      <td><button class="btn btn-green btn-xs" onclick="confirmLabPayment(${req.id})">✓ Confirm</button></td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:16px">No pending payments</td></tr>';
+}
+
+function renderLab(){
+  const tbody=document.getElementById('lab-tbody'); if(!tbody) return;
+  const reqs=DB.labRequests.filter(r=>r.status==='paid'||r.status==='done');
+  tbody.innerHTML=reqs.map(req=>{
+    const pt=DB.patients.find(p=>p.id===req.patientId);
+    const test=DB.labTests.find(t=>t.id===req.testId);
+    return `<tr>
+      <td><b>${pt?.name||'—'}</b></td>
+      <td>${test?.name||'—'}</td>
+      <td style="font-size:10px;color:var(--muted)">${req.requestedBy||'Doctor'}</td>
+      <td style="font-size:10px;color:var(--c1);font-weight:700">${pt?.doctor||'—'}</td>
+      <td><span class="badge ${req.status==='done'?'b-done':'b-wait'}">${req.status==='done'?'Done':'Pending'}</span></td>
+      <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px">${req.result||'—'}</td>
+      <td>${req.status==='paid'?`<button class="btn btn-teal btn-xs" onclick="openLabResult(${req.id})">Enter Result</button> <button class="btn btn-ghost btn-xs" onclick="printLabResultA4(${req.id})">🖨️ A4</button>`:'<span class="badge b-done">✓ Sent</span>'}</td>
+    </tr>`;
+  }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">No lab tests yet</td></tr>';
+}
+
+function renderPharmacy(){
+  // Pending prescriptions
+  const tbody=document.getElementById('pharmacy-tbody'); if(tbody){
+    const rxs=DB.prescriptions.filter(r=>r.status==='at-pharmacy'||r.status==='dispensed');
+    tbody.innerHTML=rxs.map(rx=>{
+      const pt=DB.patients.find(p=>p.id===rx.patientId);
+      const transfer=DB.transferLog.filter(t=>t.patientId===rx.patientId&&t.type==='Prescription Sent to Pharmacy').slice(-1)[0];
+      return `<tr>
+        <td><b>${pt?.name||'—'}</b></td>
+        <td>${rx.doctor}</td>
+        <td style="font-size:10px;color:var(--muted)">${transfer?.byUser||rx.doctor}</td>
+        <td style="font-size:10px;color:var(--muted)">${rx.time||'—'}</td>
+        <td style="max-width:160px;font-size:10px">${rx.meds.map(m=>DB.medicines.find(x=>x.id===m.medId)?.name||'?').join(', ')}</td>
+        <td><span class="badge ${rx.status==='dispensed'?'b-done':'b-wait'}">${rx.status==='dispensed'?'Dispensed':'Pending'}</span></td>
+        <td>${rx.status==='at-pharmacy'?`<div style="display:flex;gap:5px"><button class="btn btn-green btn-xs" onclick="dispenseRx(${rx.id})">✓ Dispense</button><button class="btn btn-ghost btn-xs" onclick="printPharmacyBillA5(${rx.id})">🖨️</button></div>`:'—'}</td>
+      </tr>`;
+    }).join('')||'<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:16px">No prescriptions pending</td></tr>';
+  }
+
+  // Stock
+  const stbody=document.getElementById('stock-tbody'); if(stbody){
+    stbody.innerHTML=DB.medicines.map((m,i)=>{
+      const st=getMedStatus(m);
+      const stockCls=m.stock<=0?'b-cancel':m.lowAlert&&m.stock<=m.lowAlert?'b-wait':'b-done';
+      return `<tr><td><b>${m.name}</b></td><td>$${m.price}</td><td>$${m.cost||0}</td>
+        <td class="mono">${m.stock}</td><td>${m.lowAlert||'—'}</td><td>${m.expiry||'—'}</td>
+        <td><span class="badge ${st.cls}">${st.label}</span> <span class="badge ${stockCls}">${m.stock<=0?'Out':m.lowAlert&&m.stock<=m.lowAlert?'Low':'Good'}</span></td>
+        <td><button class="btn btn-ghost btn-xs" onclick="editMed(${i})">Edit</button></td></tr>`;
+    }).join('');
+  }
+
+  // Returns
+  const rtbody=document.getElementById('returns-tbody'); if(rtbody){
+    rtbody.innerHTML=DB.returns.map(r=>`<tr>
+      <td>${r.date}</td><td>${r.medName}</td><td>${r.qty}</td><td>${r.reason}</td>
+      <td style="color:var(--red);font-weight:700">-$${r.refund.toFixed(2)}</td></tr>`).join('')||
+    '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:14px">No returns</td></tr>';
+  }
+
+  // Credit
+  const ctbody=document.getElementById('credit-tbody'); if(ctbody){
+    ctbody.innerHTML=DB.creditAccounts.map(c=>`<tr>
+      <td><b>${c.name}</b></td><td>${c.phone}</td>
+      <td>$${c.totalCredit.toFixed(2)}</td>
+      <td style="color:var(--green)">$${c.paid.toFixed(2)}</td>
+      <td style="color:var(--red);font-weight:700">$${c.remaining.toFixed(2)}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="openRecordPayment()">Pay</button></td></tr>`).join('');
+  }
+
+  // Recent sales
+  const salestbody=document.getElementById('sales-tbody'); if(salestbody){
+    salestbody.innerHTML=DB.transactions.filter(t=>t.type==='sale').slice().reverse().slice(0,20).map(t=>`<tr>
+      <td>${t.date}</td><td>${t.medName}</td><td>${t.qty}</td>
+      <td>$${t.price.toFixed(2)}</td><td>$${(t.cost||0).toFixed(2)}</td>
+      <td style="color:var(--green);font-weight:700">$${(t.profit||0).toFixed(2)}</td>
+      <td><span class="badge ${t.paymentType==='cash'?'b-done':'b-pend'}">${t.paymentType}</span></td></tr>`).join('')||
+    '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:14px">No sales yet</td></tr>';
+  }
+
+  // Expiry table
+  const etbody=document.getElementById('expiry-tbody'); if(etbody){
+    const alerts=DB.medicines.filter(m=>{const st=getMedStatus(m);return st.expired||st.soon||(m.lowAlert&&m.stock<=m.lowAlert);});
+    etbody.innerHTML=alerts.map(m=>{const st=getMedStatus(m);return `<tr>
+      <td><b>${m.name}</b></td><td>${m.expiry||'—'}</td><td>${m.stock}</td>
+      <td><span class="badge ${st.cls}">${st.label}</span></td></tr>`;}).join('')||
+    '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:10px">All clear ✓</td></tr>';
+  }
+
+  // Populate POS dropdown
+  populateSaleMed();
+  // Return modal
+  const retMed=document.getElementById('ret-med');
+  if(retMed) retMed.innerHTML=DB.medicines.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+}
+
+function renderAdmin(){
+  const utbody=document.getElementById('users-tbody'); if(utbody)
+    utbody.innerHTML=DB.users.map((u,i)=>`<tr>
+      <td><b>${u.name}</b></td><td><span class="badge b-pend">${u.role}</span></td>
+      <td class="mono" style="font-size:10px">${u.username}</td>
+      <td><button class="btn btn-red btn-xs" onclick="removeUser(${i})">Remove</button></td></tr>`).join('');
+  const ttbody=document.getElementById('tests-tbody'); if(ttbody)
+    ttbody.innerHTML=DB.labTests.map((t,i)=>`<tr>
+      <td>${t.name}</td><td><b>$${t.price}</b></td>
+      <td><button class="btn btn-ghost btn-xs" onclick="editTest(${i})">Edit</button></td></tr>`).join('');
+  const mtbody=document.getElementById('medicines-tbody'); if(mtbody)
+    mtbody.innerHTML=DB.medicines.map((m,i)=>`<tr>
+      <td><b>${m.name}</b></td><td>$${m.price}</td><td>$${m.cost||0}</td>
+      <td class="mono">${m.stock}</td><td>${m.lowAlert||'—'}</td><td>${m.expiry||'—'}</td>
+      <td><button class="btn btn-ghost btn-xs" onclick="editMed(${i})">Edit</button></td></tr>`).join('');
+}
+
+function renderDashboard(){
+  const dq=document.getElementById('dash-queue'); if(dq)
+    dq.innerHTML=DB.patients.slice(-5).reverse().map(pt=>`<tr onclick="openPatient(${pt.id})">
+      <td class="mono">${pt.queue}</td><td>${pt.name}</td>
+      <td style="font-size:10px">${pt.doctor}</td>
+      <td><span class="badge ${pt.status==='Waiting'?'b-wait':'b-done'}">${pt.status}</span></td></tr>`).join('')||
+    '<tr><td colspan="4" style="text-align:center;color:var(--muted)">Empty</td></tr>';
+
+  const dt=document.getElementById('dash-transfers'); if(dt){
+    const recent=DB.transferLog.filter(t=>t.patientId).slice(0,6);
+    dt.innerHTML=recent.length?recent.map(t=>`<div class="track-row">
+      <div class="track-dot ${t.type.includes('Lab')?'blue':t.type.includes('Pharmacy')?'amber':''}"></div>
+      <div><div style="font-weight:700;font-size:11px">${t.patientName} · ${t.type}</div>
+        <div style="color:var(--muted);font-size:10px">${t.from} → ${t.to} · ${t.date} ${t.time}</div></div>
+    </div>`).join(''):'<div style="color:var(--muted);font-size:12px;text-align:center">No transfers yet.</div>';
+  }
+}
+
+function renderTracking(){
+  const wrap=document.getElementById('tracking-log-wrap'); if(!wrap) return;
+  if(!DB.transferLog.length){wrap.innerHTML='<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">No transfers logged yet.</div>';return;}
+  const all=DB.transferLog.filter(t=>t.patientId);
+  wrap.innerHTML=all.map(t=>`<div class="track-row">
+    <div class="track-dot ${t.type.includes('Lab')?'blue':t.type.includes('Pharmacy')?'amber':t.status==='done'?'':'' }"></div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:12px">${t.patientName} — ${t.type}</div>
+      <div style="color:var(--muted);font-size:11px"><b>${t.from}</b> → <b>${t.to}</b> · By: ${t.byUser}</div>
+      <div style="color:var(--muted);font-size:10px">${t.date} ${t.time} · ${t.detail}</div>
+    </div>
+    <span class="badge ${t.status==='done'?'b-done':t.status==='active'?'b-pend':'b-wait'}">${t.status}</span>
+  </div>`).join('')||'<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px">No patient transfers yet.</div>';
+}
+
+function filterTracking(input){
+  const q=input.value.toLowerCase();
+  document.querySelectorAll('#tracking-log-wrap .track-row').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'flex':'none';});
+}
+
+// ════════════════════════════════════════════════
+//  PRINTING — CLEAN (no browser chrome)
+// ════════════════════════════════════════════════
+
+/* Opens a hidden iframe and prints from it — removes browser title, URL, date, page count */
+function printClean(html, paperSize='A5'){
+  const css = paperSize==='A4'
+    ? `@page{size:A4 portrait;margin:15mm}body{font-family:'Sora',sans-serif;font-size:13px;color:#000}`
+    : `@page{size:148mm 210mm;margin:8mm}body{font-family:'Sora',sans-serif;font-size:11px;color:#000}`;
+  const win=window.open('','_blank','width=1,height=1');
+  win.document.write(`<!DOCTYPE html><html><head>
+    <title> </title>
+    <meta charset="UTF-8">
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+      ${css}
+      *{box-sizing:border-box;margin:0;padding:0}
+      @media print{
+        @page{margin:${paperSize==='A4'?'15mm':'8mm'}}
+        body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+      }
+    </style>
+  </head><body onload="window.print();window.close()">${html}</body></html>`);
+  win.document.close();
+}
+
+/* ── A5 QUEUE TICKET ── */
+function printA5Ticket(pt){
+  if(!pt) return;
+  const html=`
+  <div style="width:100%;max-width:130mm;margin:0 auto;border:2px dashed #ccc;border-radius:10px;padding:16px;font-family:'JetBrains Mono',monospace;text-align:center">
+    <div style="font-size:13px;font-weight:800;font-family:'Sora',sans-serif">🏥 Baxnaano Hospital</div>
+    <div style="font-size:9px;color:#888;margin-bottom:8px">baxnaanohospital.so</div>
+    <hr style="border:none;border-top:1px dashed #ccc;margin:8px 0">
+    <div style="font-size:60px;font-weight:800;color:#0f766e;line-height:1;margin:8px 0">${pt.queue}</div>
+    <div style="font-size:9px;color:#666;margin-bottom:8px;letter-spacing:2px">QUEUE NUMBER</div>
+    <hr style="border:none;border-top:1px dashed #ccc;margin:8px 0">
+    <table style="width:100%;font-size:10px;border-collapse:collapse">
+      <tr><td style="text-align:left;padding:2px 0">Patient:</td><td style="text-align:right;font-weight:800">${pt.name}</td></tr>
+      <tr><td style="text-align:left;padding:2px 0">Doctor:</td><td style="text-align:right">${pt.doctor}</td></tr>
+      <tr><td style="text-align:left;padding:2px 0">Type:</td><td style="text-align:right">${pt.type}</td></tr>
+      <tr><td style="text-align:left;padding:2px 0">Date:</td><td style="text-align:right">${pt.date}</td></tr>
+    </table>
+    <hr style="border:none;border-top:1px dashed #ccc;margin:8px 0">
+    <div style="font-size:9px;color:#aaa">Please wait to be called · Fadlan sug in laguu yeedho</div>
+  </div>`;
+  printClean(html,'A5');
+}
+
+/* ── DOCTOR PRINT (no financial info) ── */
+function printDoctorReport(){
+  const pt=DB.patients.find(p=>p.id===currentPatientId); if(!pt) return;
+  const labResults=DB.labRequests.filter(r=>r.patientId===pt.id&&r.result);
+  const labHtml=labResults.map(r=>{
+    const test=DB.labTests.find(t=>t.id===r.testId);
+    return `<div style="margin-bottom:10px;padding:8px;border:1px solid #e2e8f0;border-radius:6px">
+      <div style="font-weight:700;font-size:12px">🔬 ${test?.name||'Test'}</div>
+      <div style="margin-top:4px">${r.result}</div>
+      <div style="font-size:9px;color:#888;margin-top:4px">Submitted by ${r.submittedBy||'Lab'} · ${r.submittedAt||''}</div>
+    </div>`;}).join('')||'<p style="color:#888;font-size:11px">No lab results yet.</p>';
+  const consHtml=pt.consultations.slice(-3).map(c=>`<div style="margin-bottom:8px;font-size:12px">
+    <div style="font-weight:700">${c.date}</div>
+    <div><b>Symptoms:</b> ${c.symptoms}</div>
+    <div><b>Diagnosis:</b> ${c.diagnosis}</div>
+    ${c.notes?`<div><b>Notes:</b> ${c.notes}</div>`:''}</div>`).join('')||'<p style="color:#888;font-size:11px">No consultations yet.</p>';
+  const html=`
+    <div style="max-width:170mm;margin:0 auto">
+      <div style="text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #0f766e">
+        <div style="font-size:20px;font-weight:800;color:#1e3a5f">🏥 Baxnaano Hospital</div>
+        <div style="font-size:10px;color:#888">Medical Report — CONFIDENTIAL</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;font-size:12px">
+        <div><b>Patient:</b> ${pt.name}</div>
+        <div><b>Age:</b> ${pt.age} Years</div>
+        <div><b>District:</b> ${pt.dist}</div>
+        <div><b>Type:</b> ${pt.type}</div>
+        <div><b>Doctor:</b> ${pt.doctor}</div>
+        <div><b>Date:</b> ${pt.date} ${pt.time}</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:800;color:#0f766e;text-transform:uppercase;border-bottom:1px solid #ccfbf1;margin-bottom:8px;padding-bottom:4px">Consultation Notes</div>
+        ${consHtml}
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:800;color:#0f766e;text-transform:uppercase;border-bottom:1px solid #ccfbf1;margin-bottom:8px;padding-bottom:4px">Lab Results</div>
+        ${labHtml}
+      </div>
+      <div style="margin-top:20px;font-size:9px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:8px">
+        Baxnaano Hospital · Medical Confidential Document · Not a Financial Receipt
+      </div>
+    </div>`;
+  printClean(html,'A4');
+}
+
+/* ── DOCTOR RX PRINT (no financial info) ── */
+function printDoctorRx(){
+  const pt=DB.patients.find(p=>p.id===currentPatientId); if(!pt) return;
+  const rxs=DB.prescriptions.filter(r=>r.patientId===currentPatientId);
+  if(!rxs.length){toast('⚠️ No prescription to print','error');return;}
+  const latest=rxs[rxs.length-1];
+  const medsHtml=latest.meds.map(m=>{const med=DB.medicines.find(x=>x.id===m.medId);
+    return `<tr>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee">${med?.name||'Medicine'}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee">${m.dose}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee">${m.freq}</td>
+      <td style="padding:6px 8px;border-bottom:1px solid #eee">${m.duration}</td>
+    </tr>`;}).join('');
+  const html=`
+    <div style="max-width:130mm;margin:0 auto">
+      <div style="text-align:center;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #0f766e">
+        <div style="font-size:17px;font-weight:800;color:#1e3a5f">🏥 Baxnaano Hospital</div>
+        <div style="font-size:10px;color:#888">Prescription — ${latest.date}</div>
+      </div>
+      <div style="font-size:12px;margin-bottom:12px">
+        <div><b>Patient:</b> ${pt.name} (${pt.age} Y)</div>
+        <div><b>Doctor:</b> ${latest.doctor}</div>
+        <div><b>Patient No.:</b> Queue #${pt.queue}</div>
+        <div><b>Date:</b> ${latest.date} ${latest.time||''}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:11px">
+        <thead><tr style="background:#f0fdfa">
+          <th style="padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase">Medicine</th>
+          <th style="padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase">Dose</th>
+          <th style="padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase">Frequency</th>
+          <th style="padding:6px 8px;text-align:left;font-size:9px;text-transform:uppercase">Duration</th>
+        </tr></thead>
+        <tbody>${medsHtml}</tbody>
+      </table>
+      <div style="margin-top:16px;font-size:9px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:8px">
+        Medical Prescription · Keep this document safe · Baxnaano Hospital
+      </div>
+    </div>`;
+  printClean(html,'A5');
+}
+
+/* ── LAB RESULT A4 ── */
+function printLabResultA4(reqId){
+  const req=DB.labRequests.find(r=>r.id===reqId); if(!req||!req.result){toast('⚠️ No result to print','error');return;}
+  const pt=DB.patients.find(p=>p.id===req.patientId);
+  const test=DB.labTests.find(t=>t.id===req.testId);
+  const html=`
+    <div style="max-width:170mm;margin:0 auto">
+      <div style="text-align:center;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #0f766e">
+        <div style="font-size:20px;font-weight:800;color:#1e3a5f">🏥 Baxnaano Hospital</div>
+        <div style="font-size:11px;color:#888">Laboratory Report</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:12px;margin-bottom:14px">
+        <div><b>Patient:</b> ${pt?.name||'—'}</div>
+        <div><b>Age:</b> ${pt?.age||'—'} Y</div>
+        <div><b>Doctor:</b> ${pt?.doctor||'—'}</div>
+        <div><b>Queue #:</b> ${pt?.queue||'—'}</div>
+        <div><b>Test:</b> ${test?.name||'—'}</div>
+        <div><b>Date:</b> ${req.submittedAt||new Date().toLocaleTimeString()} · ${new Date().toLocaleDateString('en-GB')}</div>
+      </div>
+      <div style="border:1px solid #e2e8f0;border-radius:8px;padding:16px;min-height:80px;font-size:13px;margin-bottom:14px">
+        <div style="font-size:10px;font-weight:700;color:#0f766e;text-transform:uppercase;margin-bottom:8px">Result</div>
+        ${req.result}
+      </div>
+      <div style="font-size:10px;color:#888">Submitted by: ${req.submittedBy||'Lab Staff'} &nbsp;|&nbsp; ${req.submittedAt||''}</div>
+      <div style="margin-top:20px;font-size:9px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:8px">
+        Baxnaano Hospital · Laboratory Report · Confidential Medical Document
+      </div>
+    </div>`;
+  printClean(html,'A4');
+}
+
+/* ── PHARMACY BILL A5 (Cashier/Admin — includes financials) ── */
+function printPharmacyBillA5(rxId){
+  if(currentRole==='doctor'||currentRole==='nurse'||currentRole==='lab'){
+    toast('⚠️ Only Cashier or Admin can print financial receipts','error'); return;
+  }
+  const rx=DB.prescriptions.find(r=>r.id===rxId); if(!rx) return;
+  const pt=DB.patients.find(p=>p.id===rx.patientId);
+  let total=0;
+  const medsHtml=rx.meds.map(m=>{const med=DB.medicines.find(x=>x.id===m.medId);const price=med?.price||0;total+=price;
+    return `<tr>
+      <td style="padding:5px 6px;border-bottom:1px solid #eee;font-size:10px">${med?.name||'—'}</td>
+      <td style="padding:5px 6px;border-bottom:1px solid #eee;font-size:10px">${m.dose}/${m.freq}</td>
+      <td style="padding:5px 6px;border-bottom:1px solid #eee;font-size:10px;text-align:right">$${price.toFixed(2)}</td>
+    </tr>`;}).join('');
+  const html=`
+    <div style="max-width:130mm;margin:0 auto">
+      <div style="text-align:center;margin-bottom:12px">
+        <div style="font-size:16px;font-weight:800;color:#1e3a5f">🏥 Baxnaano Hospital</div>
+        <div style="font-size:9px;color:#888">Pharmacy Receipt — ${new Date().toLocaleDateString('en-GB')}</div>
+      </div>
+      <div style="font-size:11px;margin-bottom:10px">
+        <div><b>Patient:</b> ${pt?.name||'—'}</div>
+        <div><b>Doctor:</b> ${rx.doctor}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse">
+        <thead><tr style="background:#f0fdfa">
+          <th style="padding:5px 6px;text-align:left;font-size:9px">Medicine</th>
+          <th style="padding:5px 6px;text-align:left;font-size:9px">Dosage</th>
+          <th style="padding:5px 6px;text-align:right;font-size:9px">Price</th>
+        </tr></thead>
+        <tbody>${medsHtml}</tbody>
+      </table>
+      <div style="border-top:2px solid #0f766e;margin-top:8px;padding-top:8px;text-align:right;font-size:14px;font-weight:800">Total: $${total.toFixed(2)}</div>
+      <div style="margin-top:10px;font-size:9px;color:#aaa;text-align:center;border-top:1px solid #eee;padding-top:6px">
+        Thank you · Mahadsanid · Baxnaano Hospital
+      </div>
+    </div>`;
+  printClean(html,'A5');
+}
+
+// ════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════
+function switchPTab(el,panelId){
+  const panel=document.getElementById('patient-panel');
+  panel.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  panel.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active'); document.getElementById(panelId)?.classList.add('active');
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.addEventListener('click',e=>{if(e.target.classList.contains('modal-bg'))e.target.classList.remove('open');});
+function v(id){return document.getElementById(id)?.value?.trim()||'';}
+function sv(id,val){const el=document.getElementById(id);if(el)el.textContent=val;}
+function filterQ(input){const q=input.value.toLowerCase();document.querySelectorAll('#queue-tbody tr').forEach(r=>{r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';});}
+function toast(msg,type='success'){
+  const t=document.getElementById('toast'); t.textContent=msg;
+  t.style.background=type==='error'?'#dc2626':'#0f766e';
+  t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// Clock
+function updateClock(){
+  const now=new Date();
+  const ts=now.toLocaleTimeString('en-GB');
+  const ds=now.toLocaleDateString('en-GB',{weekday:'short',month:'short',day:'numeric'});
+  sv('server-time-bar',`🕐 ${ds} · ${ts}`);
+  const stEl=document.getElementById('strip-time'); if(stEl) stEl.textContent=ts;
+}
+setInterval(updateClock,1000); updateClock();
+
+// Simulate other users online
+setInterval(()=>{
+  const count=Math.floor(Math.random()*4)+1;
+  sv('active-users-bar','');
+  const el=document.getElementById('active-users-bar');
+  if(el) el.innerHTML=`<span class="dot amber"></span>Active Users: ${count}`;
+},15000);
+
+// ════════════════════════════════════════════════
+//  SEED DEMO DATA
+// ════════════════════════════════════════════════
+(function seed(){
+  const demos=[
+    {name:'Ahmed Ali Hassan',age:'42',dist:'Hodan',phone:'0617320011',doctor:'Dr. Hassan Omar',type:'New'},
+    {name:'Fadumo Omar Warsame',age:'33',dist:'Wadajir',phone:'0619120034',doctor:'Dr. Fadumo Ahmed',type:'Follow-Up'},
+    {name:'Abdirahman Jirey',age:'58',dist:'Kahda',phone:'0615400122',doctor:'Dr. Hassan Omar',type:'New'},
+  ];
+  demos.forEach(d=>{
+    DB.queueCounter++;
+    const pt={id:Date.now()+Math.random(),name:d.name,age:d.age,dist:d.dist,phone:d.phone,doctor:d.doctor,type:d.type,queue:DB.queueCounter,status:'Waiting',date:new Date().toLocaleDateString('en-GB'),time:new Date().toLocaleTimeString('en-GB'),registeredBy:'Ali Cashier',consultations:[],labReqs:[],rx:[]};
+    DB.patients.push(pt);
+    DB.transferLog.unshift({id:Date.now()+Math.random(),time:new Date().toLocaleTimeString('en-GB'),date:new Date().toLocaleDateString('en-GB'),from:'Ali Cashier',to:d.doctor,byUser:'Ali Cashier',type:'Patient Registered',detail:`${d.name} assigned to ${d.doctor}`,status:'active',patientId:pt.id,patientName:d.name});
+  });
+  // Seed pharmacy sales data
+  const today=new Date();
+  for(let i=13;i>=0;i--){
+    const d=new Date(today); d.setDate(d.getDate()-i);
+    const dStr=d.toLocaleDateString('en-GB');
+    const cnt=Math.floor(Math.random()*6)+1;
+    for(let j=0;j<cnt;j++){
+      const med=DB.medicines[Math.floor(Math.random()*DB.medicines.length)];
+      const qty=Math.floor(Math.random()*4)+1;
+      const price=med.price*qty; const cost=(med.cost||0)*qty;
+      DB.transactions.push({id:Date.now()+Math.random(),date:dStr,type:'sale',medId:med.id,medName:med.name,qty,price,cost,profit:price-cost,paymentType:'cash'});
+    }
+  }
+})();
+</script>
+</body>
+</html>
