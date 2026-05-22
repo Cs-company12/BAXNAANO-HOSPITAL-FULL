@@ -5,8 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Baxnaano Hospital Management System</title>
  <link rel="shortcut icon" 
- href="https://raw.githubusercontent.com/Cs-company12/BAXNAANO-HOSPITAL-FULL/main/images%20(66).jpg" 
- type="image/jpeg">
+      href="https://raw.githubusercontent.com/Cs-company12/BAXNAANO-HOSPITAL-FULL/main/images%20(66).jpg" 
+      type="image/jpeg">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
@@ -19,7 +19,7 @@
 }
 body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #loginPage{display:flex;align-items:center;justify-content:center;height:100vh;
   background:linear-gradient(135deg,#0f2548 0%,#1a3a6b 50%,#1a5c3b 100%);}
 .lbox{background:#fff;border-radius:8px;width:360px;padding:40px 36px;box-shadow:0 20px 50px rgba(0,0,0,.3);}
@@ -36,7 +36,7 @@ body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:va
 .lhint{text-align:center;margin-top:14px;font-size:11px;color:#9ca3af;}
 .lhint code{background:#f3f4f6;padding:2px 7px;border-radius:3px;font-weight:600;color:#374151;}
 
-/* ── SHELL ── */
+/* APP */
 #app{display:none;height:100vh;flex-direction:column;}
 
 /* TOP NAV */
@@ -44,7 +44,7 @@ body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:va
   background:var(--purple);color:#fff;height:40px;display:flex;
   align-items:center;padding:0 10px;gap:0;flex-shrink:0;z-index:100;
 }
-.tn-ham{font-size:18px;cursor:pointer;padding:0 8px;color:#ddd;}
+.tn-ham{font-size:18px;cursor:pointer;padding:0 8px;color:#ddd;display:none;}
 .tn-brand{font-weight:700;font-size:14px;padding:0 12px 0 4px;white-space:nowrap;cursor:pointer;}
 .tn-nav{display:flex;flex:1;overflow-x:auto;scrollbar-width:none;}
 .tn-nav::-webkit-scrollbar{display:none;}
@@ -58,10 +58,11 @@ body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:va
 .tn-notif{background:var(--red);color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;}
 .tn-user{color:rgba(255,255,255,.85);white-space:nowrap;}
 
-/* CONTENT AREA */
-.content-wrap{flex:1;overflow:hidden;display:flex;flex-direction:column;}
+/* PAGE */
+.page{display:none;flex:1;flex-direction:column;overflow:hidden;}
+.page.active{display:flex;}
 
-/* PAGE HEADER BAR */
+/* HEADER */
 .ph{background:#fff;border-bottom:1px solid var(--border);padding:6px 16px;font-size:13px;color:var(--muted);flex-shrink:0;}
 .ph strong{color:var(--text);}
 
@@ -78,7 +79,7 @@ body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:va
 .btn-sm{padding:4px 10px;font-size:11px;}
 .btn-green{background:var(--green);color:#fff;}
 
-/* FILTER / TOOLBAR */
+/* TOOLBAR */
 .toolbar{background:#fff;border-bottom:1px solid var(--border);padding:6px 14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex-shrink:0;}
 .filter-chip{background:var(--purple);color:#fff;border-radius:3px;padding:3px 8px;font-size:11px;display:flex;align-items:center;gap:5px;}
 .filter-chip span{cursor:pointer;opacity:.8;}
@@ -90,7 +91,7 @@ body{font-family:'Inter',sans-serif;font-size:13px;background:var(--bg);color:va
 .pager{font-size:11px;color:var(--muted);white-space:nowrap;}
 .pager button{background:none;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:0 2px;}
 
-/* SCROLLABLE TABLE AREA */
+/* TABLES */
 .table-area{flex:1;overflow:auto;}
 .table-area::-webkit-scrollbar{width:5px;height:5px;}
 .table-area::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:3px;}
@@ -145,7 +146,6 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 .field-input{border:1.5px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:12px;width:100%;outline:none;font-family:inherit;}
 .field-input:focus{border-color:var(--teal);}
 .field-select{border:1.5px solid #d1d5db;border-radius:4px;padding:7px 10px;font-size:12px;width:100%;outline:none;font-family:inherit;background:#fff;}
-.section-btn{margin:0 16px 12px;padding:6px 14px;font-size:12px;font-weight:600;background:var(--teal);color:#fff;border:none;border-radius:4px;cursor:pointer;}
 .stbl{width:100%;border-collapse:collapse;}
 .stbl th{background:#f5f5f5;padding:8px 12px;text-align:left;font-size:11px;font-weight:600;color:var(--muted);border-bottom:1px solid var(--border);}
 .stbl td{padding:8px 12px;font-size:12px;border-bottom:1px solid #f5f5f5;}
@@ -157,14 +157,19 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 .del-btn:hover{color:var(--red);}
 .inv-badge{border:1px solid #d1d5db;border-radius:4px;padding:8px 14px;font-size:12px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;background:#fff;}
 .inv-badge:hover{background:#f5f5f5;}
-.print-area{display:none;}
-@media print{
-  body *{display:none;}
-  .print-area,.print-area *{display:block;}
-  .print-area{
-    position:fixed;inset:0;background:#fff;padding:20px;font-size:12px;
-  }
-}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:16px;}
+.dash-card{background:#fff;border-radius:6px;border:1px solid var(--border);padding:16px;}
+.dash-card h4{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
+.dash-card .num{font-size:24px;font-weight:700;color:var(--text);}
+.chart-box{background:#fff;border-radius:6px;border:1px solid var(--border);padding:16px;margin:0 16px 16px;}
+.chart-box h4{font-size:12px;font-weight:700;margin-bottom:12px;}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:140px;}
+.bar{flex:1;background:var(--teal);border-radius:3px 3px 0 0;min-width:20px;position:relative;transition:opacity .2s;}
+.bar:hover{opacity:.8;}
+.bar-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;white-space:nowrap;color:var(--muted);}
+.bar-val{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;}
 
 /* MODAL */
 .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;}
@@ -185,7 +190,13 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 .mfield textarea{resize:vertical;min-height:70px;}
 .xbtn{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);line-height:1;}
 
-/* PRINT RECEIPT */
+/* PRINT */
+.print-area{display:none;}
+@media print{
+  body *{display:none;}
+  .print-area,.print-area *{display:block;}
+  .print-area{position:fixed;inset:0;background:#fff;padding:20px;font-size:12px;}
+}
 .rx-print{font-family:'Inter',sans-serif;color:#000;font-size:12px;padding:20px;}
 .rx-logo{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
 .rx-logo svg{width:50px;height:50px;}
@@ -200,37 +211,17 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 .rx-table{width:100%;border-collapse:collapse;font-size:11px;margin:10px 0;}
 .rx-table th{background:#f0f0f0;border:1px solid #ccc;padding:5px 8px;text-align:left;font-weight:600;}
 .rx-table td{border:1px solid #ddd;padding:5px 8px;}
-.rx-total{text-align:right;font-size:13px;margin-top:10px;}
 .rx-footer{margin-top:20px;font-size:10px;color:#6b7280;text-align:center;border-top:1px solid #ccc;padding-top:10px;}
 
 /* TOAST */
 .toast{position:fixed;bottom:20px;right:20px;background:#323232;color:#fff;border-radius:6px;padding:11px 18px;font-size:13px;z-index:9999;box-shadow:var(--shadow2);transform:translateY(80px);transition:transform .3s;display:flex;align-items:center;gap:8px;}
 .toast.show{transform:translateY(0);}
 
-/* PAGE VISIBILITY */
-.page{display:none;flex:1;flex-direction:column;overflow:hidden;}
-.page.active{display:flex;}
-
-/* DASHBOARD CARDS */
-.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;padding:16px;}
-.dash-card{background:#fff;border-radius:6px;border:1px solid var(--border);padding:16px;}
-.dash-card h4{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:8px;}
-.dash-card .num{font-size:24px;font-weight:700;color:var(--text);}
-.dash-card .up{font-size:11px;color:var(--green);margin-top:4px;}
-
-/* CHART AREA */
-.chart-box{background:#fff;border-radius:6px;border:1px solid var(--border);padding:16px;margin:0 16px 16px;}
-.chart-box h4{font-size:12px;font-weight:700;margin-bottom:12px;}
-.bar-chart{display:flex;align-items:flex-end;gap:8px;height:140px;}
-.bar{flex:1;background:var(--teal);border-radius:3px 3px 0 0;min-width:20px;position:relative;transition:opacity .2s;}
-.bar:hover{opacity:.8;}
-.bar-label{position:absolute;bottom:-16px;left:50%;transform:translateX(-50%);font-size:9px;white-space:nowrap;color:var(--muted);}
-.bar-val{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;font-weight:600;}
-
 /* RESPONSIVE */
 @media(max-width:768px){
-  .tn-nav{display:none;}
-  .tn-brand{font-size:12px;}
+  .tn-ham{display:block;}
+  .tn-nav{position:absolute;top:40px;left:0;right:0;background:var(--purple);flex-direction:column;display:none;}
+  .tn-nav.open{display:flex;}
   .tb-search{width:120px;}
   .dash-grid{grid-template-columns:1fr 1fr;}
   .fg3{grid-template-columns:1fr;}
@@ -259,7 +250,6 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 
 <!-- APP -->
 <div id="app">
-  <!-- TOP NAV -->
   <div class="topnav" id="topnav">
     <span class="tn-ham" onclick="toggleMobileNav()">☰</span>
     <span class="tn-brand" id="tnBrand" onclick="cycleModule()">Cashier</span>
@@ -272,9 +262,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
     </div>
   </div>
 
-  <!-- PAGES -->
-
-  <!-- ════ CASHIER LIST ════ -->
+  <!-- CASHIER LIST -->
   <div class="page" id="pg-cashier-list">
     <div class="ph"><strong>Cashier's Appointment</strong></div>
     <div class="abar">
@@ -289,24 +277,24 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <button class="tb-btn" onclick="filterAppointments('Waiting')">Waiting</button>
         <button class="tb-btn" onclick="filterAppointments('Completed')">Completed</button>
         <button class="tb-btn" onclick="loadCashier()">Refresh</button>
-        <span class="pager" id="cashierPager">1-40 / 40 <button onclick="prevPage('cashier')">‹</button><button onclick="nextPage('cashier')">›</button></span>
+        <span class="pager" id="cashierPager">0 rows</span>
       </div>
     </div>
     <div class="table-area">
       <table class="main-table">
         <thead><tr>
-          <th style="width:28px"><input type="checkbox" id="chkAllCashier" onclick="toggleAll('cashierTB',this)"/></th>
+          <th style="width:28px"><input type="checkbox" onclick="toggleAll('cashierTB',this)"/></th>
           <th>Queue</th><th>Appointment #</th><th>Patient</th><th>ID#</th>
-          <th>Patient Age</th><th>Appointment Slot</th><th>Patient In Date</th>
-          <th>Patient Type</th><th>Appointment Type</th><th>Appointment Date</th>
-          <th>Doctor</th><th>Branch</th><th>Payment Type</th><th>Status</th><th>Action</th>
+          <th>Age</th><th>Slot</th><th>In Date</th>
+          <th>Type</th><th>Appt Type</th><th>Appt Date</th>
+          <th>Doctor</th><th>Branch</th><th>Payment</th><th>Status</th><th>Action</th>
         </tr></thead>
         <tbody id="cashierTB"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ════ CASHIER FORM ════ -->
+  <!-- CASHIER FORM -->
   <div class="page" id="pg-cashier-form">
     <div class="fbar">
       <span class="fbread"><a onclick="showPage('cashier-list')">Cashier's Appointment</a> / <span id="cf-id">AP042282</span></span>
@@ -329,99 +317,66 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
       <button class="btn btn-outline btn-sm" onclick="recallPatient()">RECALL</button>
       <button class="btn btn-purple btn-sm" onclick="markCompleted()">MARK AS COMPLETED</button>
       <div style="margin-left:auto;">
-        <div class="inv-badge" onclick="showPayments()">📋 <span id="cf-invcount">1</span><br/><small style="font-size:9px">Invoice</small></div>
+        <div class="inv-badge" onclick="showPayments()">📋 <span id="cf-invcount">0</span><br/><small style="font-size:9px">Invoice</small></div>
       </div>
     </div>
     <div class="fview">
       <div class="fbody">
-        <!-- Patient Info -->
         <div class="fcard">
           <div class="fcard-head">Patient Info &amp; Appointment</div>
           <div class="fcard-body">
             <div class="fg fg3" style="margin-bottom:14px;">
-              <div><div class="field-lbl">Patient</div><div class="field-val td-link" id="cf-patient">NASRA FARAH ALI</div></div>
-              <div><div class="field-lbl">ID#</div><div class="field-val" id="cf-idnum">0038806</div></div>
-              <div><div class="field-lbl">Sex</div><div class="field-val" id="cf-sex">Female</div></div>
-              <div><div class="field-lbl">Mobile</div><div class="field-val" id="cf-mobile">0610150128</div></div>
-              <div><div class="field-lbl">Patient Age</div><div class="field-val" id="cf-age">23 Y</div></div>
-              <div><div class="field-lbl">Appointment #</div><div class="field-val td-link" id="cf-appt">AP042282</div></div>
+              <div><div class="field-lbl">Patient</div><div class="field-val td-link" id="cf-patient">—</div></div>
+              <div><div class="field-lbl">ID#</div><div class="field-val" id="cf-idnum">—</div></div>
+              <div><div class="field-lbl">Sex</div><div class="field-val" id="cf-sex">—</div></div>
+              <div><div class="field-lbl">Mobile</div><div class="field-val" id="cf-mobile">—</div></div>
+              <div><div class="field-lbl">Patient Age</div><div class="field-val" id="cf-age">—</div></div>
+              <div><div class="field-lbl">Appointment #</div><div class="field-val td-link" id="cf-appt">—</div></div>
             </div>
             <div class="fg fg3">
-              <div><div class="field-lbl">Appointment Date</div><div class="field-val" id="cf-date">05/07/2026 06:54:18</div></div>
-              <div><div class="field-lbl">Doctor</div><div class="field-val td-link" id="cf-doctor">DR. YAHYA SHOOLE (Pediatric Gastroenterology)</div></div>
-              <div><div class="field-lbl">Branch</div><div class="field-val" id="cf-branch">HQ</div></div>
+              <div><div class="field-lbl">Appointment Date</div><div class="field-val" id="cf-date">—</div></div>
+              <div><div class="field-lbl">Doctor</div><div class="field-val td-link" id="cf-doctor">—</div></div>
+              <div><div class="field-lbl">Branch</div><div class="field-val" id="cf-branch">—</div></div>
               <div><div class="field-lbl">Patient Type</div><div class="field-val">OPD</div></div>
               <div><div class="field-lbl">Appointment Type</div><div class="field-val">New</div></div>
-              <div><div class="field-lbl">Payment Type</div><div class="field-val" id="cf-payment">Cash</div></div>
+              <div><div class="field-lbl">Payment Type</div><div class="field-val" id="cf-payment">—</div></div>
             </div>
           </div>
         </div>
-
-        <!-- Queue -->
         <div class="fcard">
-          <div class="fcard-head">Queue # <span id="cf-queue" style="color:var(--red);font-size:20px;font-weight:900;margin-left:12px;">1</span></div>
+          <div class="fcard-head">Queue # <span id="cf-queue" style="color:var(--red);font-size:20px;font-weight:900;margin-left:12px;">—</span></div>
         </div>
-
-        <!-- Payments -->
         <div class="fcard">
           <div class="fcard-head">Payments <button class="btn btn-teal btn-sm" onclick="openModal('mPayment')">ADD PAYMENT</button></div>
           <table class="stbl">
             <thead><tr><th>Receipt #</th><th>Method</th><th>Amount</th><th>Date</th><th></th></tr></thead>
-            <tbody id="cf-payrows"></tbody>
+            <tbody id="cf-payrows"><tr><td colspan="5" style="color:#aaa;font-style:italic;padding:8px 12px;">No payments recorded</td></tr></tbody>
             <tfoot><tr><td colspan="2">Total Paid</td><td id="cf-paytotal">0.00</td><td colspan="2"></td></tr></tfoot>
           </table>
         </div>
-
-        <!-- Lab -->
         <div class="fcard">
-          <div class="fcard-head">
-            Lab <span id="cf-labcount">0</span>
-            <button class="btn btn-teal btn-sm" onclick="openModal('mLabReq')">ADD TESTS</button>
-          </div>
+          <div class="fcard-head">Lab <span id="cf-labcount">0</span> <button class="btn btn-teal btn-sm" onclick="openModal('mLabReq')">ADD TESTS</button></div>
           <table class="stbl">
-            <thead><tr><th>Procedure</th><th>Availability</th><th>Doctor Instructions</th><th>Unit Price</th><th>Discount</th><th></th></tr></thead>
-            <tbody id="cf-labrows"></tbody>
+            <thead><tr><th>Procedure</th><th>Availability</th><th>Instructions</th><th>Unit Price</th><th>Discount</th><th></th></tr></thead>
+            <tbody id="cf-labrows"><tr><td colspan="6" style="color:#aaa;font-style:italic;padding:8px 12px;">No lab tests added</td></tr></tbody>
             <tfoot><tr><td colspan="3"></td><td id="cf-labtotal">0.00</td><td>0.00</td><td></td></tr></tfoot>
           </table>
           <a class="add-line" onclick="openModal('mLabReq')">+ Add a line</a>
         </div>
-
-        <!-- Imaging -->
-        <div class="fcard">
-          <div class="fcard-head">Imaging <button class="btn btn-teal btn-sm" onclick="toast('Imaging module coming in v1.1')">ADD IMAGING</button></div>
-          <table class="stbl">
-            <thead><tr><th>Procedure</th><th>Doctor Instructions</th><th>Unit Price</th><th>Discount</th><th></th></tr></thead>
-            <tbody id="cf-imgrows"><tr><td colspan="5" style="color:#aaa;font-style:italic;padding:10px 12px;">No imaging added</td></tr></tbody>
-            <tfoot><tr><td colspan="2"></td><td>0.00</td><td>0.00</td><td></td></tr></tfoot>
-          </table>
-          <a class="add-line" onclick="toast('Imaging module coming in v1.1')">+ Add a line</a>
-        </div>
-
-        <!-- Pharmacy -->
         <div class="fcard">
           <div class="fcard-head">Pharmacy <button class="btn btn-teal btn-sm" onclick="openModal('mPharmForm')">ADD MEDICINE</button></div>
           <table class="stbl">
-            <thead><tr><th>Brand Name</th><th>Dosage Form</th><th>Route</th><th>Frequency</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th><th></th></tr></thead>
-            <tbody id="cf-pharmrows"><tr><td colspan="8" style="color:#aaa;font-style:italic;padding:10px 12px;">No medicines added</td></tr></tbody>
+            <thead><tr><th>Brand Name</th><th>Dosage</th><th>Route</th><th>Frequency</th><th>Qty</th><th>Unit Price</th><th>Subtotal</th><th></th></tr></thead>
+            <tbody id="cf-pharmrows"><tr><td colspan="8" style="color:#aaa;font-style:italic;padding:8px 12px;">No medicines added</td></tr></tbody>
             <tfoot><tr><td colspan="5"></td><td>Subtotal:</td><td id="cf-pharmtotal">$0.00</td><td></td></tr></tfoot>
           </table>
           <a class="add-line" onclick="openModal('mPharmForm')">+ Add a line</a>
-        </div>
-
-        <!-- Other Procedure -->
-        <div class="fcard">
-          <div class="fcard-head">Other Procedure</div>
-          <table class="stbl">
-            <thead><tr><th>Procedure</th><th>Doctor Instructions</th><th>Qty</th><th>Unit Price</th><th>Total</th><th>Discount</th><th></th></tr></thead>
-            <tbody id="cf-procrows"><tr><td colspan="7" style="color:#aaa;font-style:italic;padding:10px 12px;">No procedures added</td></tr></tbody>
-          </table>
-          <a class="add-line" onclick="toast('Procedure catalog coming in v1.1')">+ Add a line</a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ════ LAB / SAMPLE COLLECTION ════ -->
+  <!-- LAB -->
   <div class="page" id="pg-lab">
     <div class="ph"><strong>Sample Collection</strong></div>
     <div class="abar">
@@ -435,22 +390,21 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <button class="tb-btn" onclick="filterLab('Waiting')">Waiting</button>
         <button class="tb-btn" onclick="filterLab('Partially Collected')">Partial</button>
         <button class="tb-btn" onclick="loadLab()">Refresh</button>
-        <span class="pager" id="labPager">1-4 / 4 <button onclick="prevPage('lab')">‹</button><button onclick="nextPage('lab')">›</button></span>
+        <span class="pager" id="labPager">0 rows</span>
       </div>
     </div>
     <div class="table-area">
       <table class="main-table">
         <thead><tr>
           <th style="width:28px"><input type="checkbox" onclick="toggleAll('labTB',this)"/></th>
-          <th>Test #</th><th>Patient</th><th>ID#</th>
-          <th>Sex</th><th>Mobile</th><th>Patient Age</th><th>Sample State</th><th>Total ($)</th><th>Action</th>
+          <th>Test #</th><th>Patient</th><th>ID#</th><th>Sex</th><th>Mobile</th><th>Age</th><th>State</th><th>Total ($)</th><th>Action</th>
         </tr></thead>
         <tbody id="labTB"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ════ PHARMACY LIST ════ -->
+  <!-- PHARMACY LIST -->
   <div class="page" id="pg-pharmacy-list">
     <div class="ph"><strong>Pharmacy</strong></div>
     <div class="abar">
@@ -464,25 +418,22 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <button class="tb-btn" onclick="filterPharm('Quotation')">Quotation</button>
         <button class="tb-btn" onclick="filterPharm('Done')">Dispensed</button>
         <button class="tb-btn" onclick="loadPharmacy()">Refresh</button>
-        <span class="pager" id="pharmPager">1-4 / 4 <button onclick="prevPage('pharm')">‹</button><button onclick="nextPage('pharm')">›</button></span>
-        <button class="tb-btn">☰</button><button class="tb-btn">⊞</button><button class="tb-btn">📅</button><button class="tb-btn">📊</button><button class="tb-btn">⊙</button>
+        <span class="pager" id="pharmPager">0 rows</span>
       </div>
     </div>
     <div class="table-area">
       <table class="main-table">
         <thead><tr>
           <th style="width:28px"><input type="checkbox" onclick="toggleAll('pharmTB',this)"/></th>
-          <th>Prescription #</th><th>Patient #</th><th>Date</th>
-          <th>Doctor</th><th>Sales Person</th><th>Payment Method</th>
-          <th>Discount</th><th>Net Amount</th><th>Status</th><th>Action</th>
+          <th>Rx #</th><th>Patient</th><th>Date</th><th>Doctor</th><th>Discount</th><th>Net Amount</th><th>Status</th><th>Action</th>
         </tr></thead>
         <tbody id="pharmTB"></tbody>
-        <tfoot><tr><td colspan="7" style="padding:9px 12px;">Total</td><td id="pharmTotal" style="padding:9px 12px;"></td><td colspan="2"></td></tr></tfoot>
+        <tfoot><tr><td colspan="5" style="padding:9px 12px;">Total</td><td id="pharmTotal" style="padding:9px 12px;">$0.00</td><td colspan="2"></td></tr></tfoot>
       </table>
     </div>
   </div>
 
-  <!-- ════ PHARMACY FORM ════ -->
+  <!-- PHARMACY FORM -->
   <div class="page" id="pg-pharmacy-form">
     <div class="fbar">
       <span class="fbread"><a onclick="showPage('pharmacy-list')">Pharmacy</a> / <span id="pf-id">S84655</span></span>
@@ -507,14 +458,13 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
           <div class="fcard-body">
             <div style="font-size:22px;font-weight:700;color:var(--text);margin-bottom:16px;" id="pf-num">S84655</div>
             <div class="fg fg3">
-              <div><div class="field-lbl">Patient</div><div class="field-val td-link" id="pf-patient">ABDIRAHIIN AHMED MOHAMED</div></div>
-              <div><div class="field-lbl">ID#</div><div class="field-val" id="pf-idnum">0036880</div></div>
-              <div><div class="field-lbl">Sex</div><div class="field-val" id="pf-sex">Male</div></div>
-              <div><div class="field-lbl">Patient Age</div><div class="field-val" id="pf-age">1 Y</div></div>
-              <div><div class="field-lbl">Mobile</div><div class="field-val" id="pf-mobile">0614626423</div></div>
-              <div><div class="field-lbl">Appointment #</div><div class="field-val td-link" id="pf-appt">AP033337</div></div>
-              <div><div class="field-lbl">Prescription Date</div><div class="field-val" id="pf-date">10/23/2025 11:11:39</div></div>
-              <div><div class="field-lbl">Doctor</div><div class="field-val td-link" id="pf-doctor">DR. YAHYA SHOOLE (Pediatric Gastro...)</div></div>
+              <div><div class="field-lbl">Patient</div><div class="field-val td-link" id="pf-patient">—</div></div>
+              <div><div class="field-lbl">ID#</div><div class="field-val" id="pf-idnum">—</div></div>
+              <div><div class="field-lbl">Sex</div><div class="field-val" id="pf-sex">—</div></div>
+              <div><div class="field-lbl">Age</div><div class="field-val" id="pf-age">—</div></div>
+              <div><div class="field-lbl">Mobile</div><div class="field-val" id="pf-mobile">—</div></div>
+              <div><div class="field-lbl">Prescription Date</div><div class="field-val" id="pf-date">—</div></div>
+              <div><div class="field-lbl">Doctor</div><div class="field-val td-link" id="pf-doctor">—</div></div>
               <div><div class="field-lbl">Branch</div><div class="field-val">HQ</div></div>
             </div>
           </div>
@@ -522,22 +472,22 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <div class="fcard">
           <div class="fcard-head">Medicine Line <button class="btn btn-teal btn-sm" onclick="openModal('mPharmForm')">+ Add Medicine</button></div>
           <table class="stbl">
-            <thead><tr><th>Brand Name</th><th>Medicine Desc</th><th>Dosage Form</th><th>Route</th><th>Frequency</th><th>Dose</th><th>Qty</th><th>Available Qty</th><th>Unit Price</th><th>Subtotal</th><th>Total</th><th></th></tr></thead>
-            <tbody id="pf-medrows"></tbody>
+            <thead><tr><th>Brand Name</th><th>Desc</th><th>Dosage</th><th>Route</th><th>Freq</th><th>Dose</th><th>Qty</th><th>Avail</th><th>Price</th><th>Subtotal</th><th>Total</th><th></th></tr></thead>
+            <tbody id="pf-medrows"><tr><td colspan="12" style="color:#aaa;font-style:italic;padding:8px 12px;">No medicines added</td></tr></tbody>
           </table>
           <a class="add-line" onclick="openModal('mPharmForm')">+ Add a product</a>
           <div style="text-align:right;padding:12px 16px;font-size:12px;border-top:1px solid var(--border);">
-            <div>Subtotal: <strong id="pf-sub">$14.00</strong></div>
+            <div>Subtotal: <strong id="pf-sub">$0.00</strong></div>
             <div>Discount: <strong id="pf-disc">0.00</strong></div>
-            <div>Total Amount: <strong id="pf-total">14.00</strong></div>
-            <div>Balance: <strong id="pf-bal">14.00</strong></div>
+            <div>Total Amount: <strong id="pf-total">0.00</strong></div>
+            <div>Balance: <strong id="pf-bal">0.00</strong></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ════ DOCTORS ════ -->
+  <!-- DOCTORS -->
   <div class="page" id="pg-doctors">
     <div class="ph"><strong>Doctor's Appointment</strong></div>
     <div class="abar">
@@ -550,7 +500,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <button class="tb-btn" onclick="filterDoctors('Waiting')">Waiting</button>
         <button class="tb-btn" onclick="filterDoctors('Completed')">Completed</button>
         <button class="tb-btn" onclick="loadDoctors()">Refresh</button>
-        <span class="pager" id="doctorPager">1-40 / 40</span>
+        <span class="pager" id="doctorPager">0 rows</span>
       </div>
     </div>
     <div class="table-area">
@@ -558,16 +508,16 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <thead><tr>
           <th style="width:28px"><input type="checkbox" onclick="toggleAll('doctorTB',this)"/></th>
           <th>Queue</th><th>Appointment #</th><th>Patient</th><th>ID#</th>
-          <th>Patient Age</th><th>Slot</th><th>Patient In Date</th>
-          <th>Patient Type</th><th>Appt Type</th><th>Appt Date</th>
-          <th>Doctor</th><th>Branch</th><th>Payment Type</th><th>Status</th>
+          <th>Age</th><th>Slot</th><th>In Date</th>
+          <th>Type</th><th>Appt Type</th><th>Appt Date</th>
+          <th>Doctor</th><th>Branch</th><th>Payment</th><th>Status</th>
         </tr></thead>
         <tbody id="doctorTB"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- ════ PATIENTS ════ -->
+  <!-- PATIENTS -->
   <div class="page" id="pg-patients">
     <div class="ph"><strong>Patient Registration</strong></div>
     <div class="abar">
@@ -578,7 +528,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
       <input class="tb-search" type="text" placeholder="Search patients..." oninput="searchTable('patTB',this.value)"/>
       <div class="tb-right">
         <button class="tb-btn" onclick="loadPatients()">Refresh</button>
-        <span class="pager" id="patPager">1-10 / 10</span>
+        <span class="pager" id="patPager">0 patients</span>
       </div>
     </div>
     <div class="table-area">
@@ -592,7 +542,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
     </div>
   </div>
 
-  <!-- ════ INVENTORY ════ -->
+  <!-- INVENTORY -->
   <div class="page" id="pg-inventory">
     <div class="ph"><strong>Inventory / Stock</strong></div>
     <div class="abar">
@@ -604,7 +554,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
       <div class="tb-right">
         <button class="tb-btn" onclick="filterInventory('low')">Low Stock</button>
         <button class="tb-btn" onclick="loadInventory()">Refresh</button>
-        <span class="pager" id="invPager">1-20 / 20</span>
+        <span class="pager" id="invPager">0 items</span>
       </div>
     </div>
     <div class="table-area">
@@ -618,7 +568,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
     </div>
   </div>
 
-  <!-- ════ REPORTS ════ -->
+  <!-- REPORTS -->
   <div class="page" id="pg-reports">
     <div class="ph"><strong>Reports &amp; Analytics</strong></div>
     <div class="dash-grid" id="dashGrid">
@@ -631,17 +581,11 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
       <div class="dash-card"><h4>Total Patients</h4><div class="num" id="dash-pat">0</div></div>
       <div class="dash-card"><h4>Active Doctors</h4><div class="num" id="dash-doc">0</div></div>
     </div>
-    <div class="chart-box">
-      <h4>Revenue Trend (Last 7 Days)</h4>
-      <div class="bar-chart" id="revChart"></div>
-    </div>
-    <div class="chart-box">
-      <h4>Appointments by Doctor</h4>
-      <div class="bar-chart" id="docChart"></div>
-    </div>
+    <div class="chart-box"><h4>Revenue Trend (Last 7 Days)</h4><div class="bar-chart" id="revChart"></div></div>
+    <div class="chart-box"><h4>Appointments by Doctor</h4><div class="bar-chart" id="docChart"></div></div>
   </div>
 
-  <!-- ════ USERS ════ -->
+  <!-- USERS -->
   <div class="page" id="pg-users">
     <div class="ph"><strong>User &amp; Role Management</strong></div>
     <div class="abar">
@@ -664,7 +608,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
     </div>
   </div>
 
-  <!-- ════ SETTINGS ════ -->
+  <!-- SETTINGS -->
   <div class="page" id="pg-settings">
     <div class="ph"><strong>System Settings</strong></div>
     <div class="fview">
@@ -684,8 +628,8 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
         <div class="fcard">
           <div class="fcard-head">Backup &amp; Data</div>
           <div class="fcard-body">
-            <button class="btn btn-outline" onclick="toast('Backup started...')">Download Database Backup</button>
-            <button class="btn btn-outline" style="margin-left:8px;" onclick="toast('Export started...')">Export All Data to CSV</button>
+            <button class="btn btn-outline" onclick="toast('Backup feature: copy database/baxnaano.db to secure location')">Download Database Backup</button>
+            <button class="btn btn-outline" style="margin-left:8px;" onclick="exportTable('cashierTB','full_export')">Export All Data to CSV</button>
           </div>
         </div>
       </div>
@@ -694,7 +638,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 
 </div><!-- /app -->
 
-<!-- ═══ MODALS ═══ -->
+<!-- MODALS -->
 
 <!-- NEW CASHIER APPOINTMENT -->
 <div class="modal-bg" id="mCashier">
@@ -1056,7 +1000,7 @@ table.main-table{width:100%;border-collapse:collapse;background:#fff;}
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-//  BAXNAANO HMS - FULL API CLIENT
+//  BAXNAANO HMS - FULL API CLIENT (CLEAN VERSION)
 // ═══════════════════════════════════════════════════════════════
 
 const API_BASE = '';
@@ -1195,11 +1139,9 @@ function showLogin(){
 // ─── APP INIT ───
 function initApp(){
   if(!currentUser) return;
-  // Filter modules by role
   const allowed = Object.keys(MODULES).filter(k=>MODULES[k].roles.includes(currentUser.role));
   if(allowed.length===0){ logout(); return; }
   setModule(allowed[0]);
-  loadDashboard();
 }
 
 function setModule(mod){
@@ -1211,8 +1153,849 @@ function setModule(mod){
   const nav = document.getElementById('tnNav');
   nav.innerHTML = m.nav.map((n,i)=>`<a onclick="navClick(this,'${mod}')" ${i===0?'class="active"':''}>${n}</a>`).join('');
   showPage(m.page);
-  // Load data for module
-  if(mod==='cashier'||mod==='patients') loadCashier();
-  if(mod==='lab') loadLab();
-  if(mod==='pharmacy') loadPharmacy();
-  if(mod==='doctors') loadDoctor
+}
+
+function navClick(el,mod){
+  document.querySelectorAll('#tnNav a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+  const m = MODULES[mod];
+  showPage(m.page);
+}
+
+function cycleModule(){
+  const allowed = Object.keys(MODULES).filter(k=>MODULES[k].roles.includes(currentUser.role));
+  const idx = (allowed.indexOf(currentModule)+1)%allowed.length;
+  setModule(allowed[idx]);
+}
+
+function toggleMobileNav(){
+  const nav = document.getElementById('tnNav');
+  nav.classList.toggle('open');
+}
+
+// ─── PAGES ───
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const pg = document.getElementById('pg-'+id);
+  if(pg){
+    pg.classList.add('active');
+    if(id==='cashier-list') loadCashier();
+    if(id==='lab') loadLab();
+    if(id==='pharmacy-list') loadPharmacy();
+    if(id==='doctors') loadDoctors();
+    if(id==='patients') loadPatients();
+    if(id==='inventory') loadInventory();
+    if(id==='reports') loadReports();
+    if(id==='users') loadUsers();
+  }
+}
+
+// ─── CASHIER ───
+let cashierData = [];
+let cashierFilter = '';
+
+async function loadCashier(){
+  try{
+    const data = await api(`/appointments?search=${encodeURIComponent(cashierFilter)}`);
+    cashierData = data || [];
+    renderCashier();
+  }catch(e){ toast('Error loading appointments: '+e.message); }
+}
+
+function renderCashier(){
+  const tb = document.getElementById('cashierTB');
+  if(!tb) return;
+  tb.innerHTML = cashierData.map(r=>`
+    <tr onclick="openCashierForm('${r.appointment_num}')">
+      <td><input type="checkbox" onclick="event.stopPropagation()"/></td>
+      <td>${r.queue_num||'—'}</td>
+      <td class="td-link">${esc(r.appointment_num)}</td>
+      <td>${esc(r.patient)}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.pid)}</td>
+      <td>${esc(r.age)}</td>
+      <td>${esc(r.slot)}</td>
+      <td style="font-size:11px;">${fmtDate(r.in_date)}</td>
+      <td>${esc(r.type)}</td>
+      <td>${esc(r.appt_type)}</td>
+      <td style="font-size:11px;">${fmtDate(r.appt_date)}</td>
+      <td>${esc(r.doctor_name)}</td>
+      <td>${esc(r.branch)}</td>
+      <td><span class="badge ${r.payment_type==='Cash'?'b-cash':'b-free'}">${esc(r.payment_type)}</span></td>
+      <td><span class="badge ${r.status==='Waiting'?'b-waiting':r.status==='Completed'?'b-done':'b-scheduled'}">${esc(r.status)}</span></td>
+      <td><button class="btn btn-outline btn-sm" onclick="event.stopPropagation();deleteAppt('${r.appointment_num}')">🗑</button></td>
+    </tr>`).join('');
+  document.getElementById('cashierPager').textContent = `${cashierData.length} rows`;
+}
+
+function filterAppointments(status){
+  cashierFilter = status;
+  loadCashier();
+}
+
+async function openCashierForm(id){
+  try{
+    const r = await api(`/appointments/${id}`);
+    currentApptId = r.appointment_num;
+    document.getElementById('cf-id').textContent = r.appointment_num;
+    document.getElementById('cf-patient').textContent = r.patient;
+    document.getElementById('cf-idnum').textContent = r.pid || '—';
+    document.getElementById('cf-sex').textContent = r.sex || '—';
+    document.getElementById('cf-mobile').textContent = r.mobile || '—';
+    document.getElementById('cf-age').textContent = r.age || '—';
+    document.getElementById('cf-appt').textContent = r.appointment_num;
+    document.getElementById('cf-date').textContent = fmtDate(r.appt_date);
+    document.getElementById('cf-doctor').textContent = r.doctor_name;
+    document.getElementById('cf-branch').textContent = r.branch;
+    document.getElementById('cf-payment').textContent = r.payment_type;
+    document.getElementById('cf-queue').textContent = r.queue_num || '—';
+    
+    document.querySelectorAll('#pg-cashier-form .sf-step').forEach(s=>s.classList.remove('active'));
+    if(r.status==='Waiting') document.getElementById('sf-sched').classList.add('active');
+    else if(r.status==='Completed') document.getElementById('sf-comp').classList.add('active');
+    else document.getElementById('sf-draft').classList.add('active');
+    
+    loadApptPayments(r.id);
+    showPage('cashier-form');
+  }catch(e){ toast(e.message); }
+}
+
+async function loadApptPayments(apptId){
+  try{
+    const payments = await api('/cashier/payments');
+    const filtered = payments.filter(p=>p.appointment_id===apptId);
+    const rows = document.getElementById('cf-payrows');
+    let total = 0;
+    rows.innerHTML = filtered.map(p=>{
+      total += p.amount;
+      return `<tr><td>${esc(p.receipt_num)}</td><td>${esc(p.payment_method)}</td><td>$${p.amount.toFixed(2)}</td><td>${fmtDate(p.created_at)}</td><td></td></tr>`;
+    }).join('') || '<tr><td colspan="5" style="color:#aaa;font-style:italic;padding:8px 12px;">No payments recorded</td></tr>';
+    document.getElementById('cf-paytotal').textContent = total.toFixed(2);
+    document.getElementById('cf-invcount').textContent = filtered.length;
+  }catch(e){}
+}
+
+async function saveCashier(){
+  const p = document.getElementById('mc-patient').value.trim();
+  if(!p){ toast('Patient name required'); return; }
+  const body = {
+    patient_name: p,
+    patient_id: document.getElementById('mc-idnum').value,
+    sex: document.getElementById('mc-sex').value,
+    age: document.getElementById('mc-age').value,
+    mobile: document.getElementById('mc-mobile').value,
+    doctor: document.getElementById('mc-doctor').value,
+    payment_type: document.getElementById('mc-payment').value,
+    slot: document.getElementById('mc-slot').value,
+    branch: document.getElementById('mc-branch').value,
+    appt_type: 'New'
+  };
+  try{
+    await api('/appointments',{method:'POST',body});
+    closeModal('mCashier');
+    document.getElementById('mc-patient').value='';
+    document.getElementById('mc-idnum').value='';
+    document.getElementById('mc-age').value='';
+    document.getElementById('mc-mobile').value='';
+    loadCashier();
+    toast('✅ Appointment saved!');
+  }catch(e){ toast(e.message); }
+}
+
+async function deleteAppt(id){
+  if(!confirm('Delete this appointment?')) return;
+  try{
+    await api(`/appointments/${id}`,{method:'DELETE'});
+    loadCashier();
+    toast('✅ Deleted');
+  }catch(e){ toast(e.message); }
+}
+
+async function markCompleted(){
+  if(!currentApptId) return;
+  try{
+    await api(`/appointments/${currentApptId}/status`,{method:'PUT',body:{status:'Completed'}});
+    toast('✅ Marked as Completed');
+    openCashierForm(currentApptId);
+  }catch(e){ toast(e.message); }
+}
+
+async function savePayment(){
+  const amt = parseFloat(document.getElementById('pay-amount').value);
+  if(!amt || amt<=0){ toast('Enter valid amount'); return; }
+  try{
+    const appt = await api(`/appointments/${currentApptId}`);
+    await api('/cashier/pay',{method:'POST',body:{
+      appointment_id: appt.id,
+      patient_id: appt.patient_id,
+      amount: amt,
+      payment_method: document.getElementById('pay-method').value
+    }});
+    closeModal('mPayment');
+    document.getElementById('pay-amount').value='';
+    loadApptPayments(appt.id);
+    toast('✅ Payment recorded!');
+  }catch(e){ toast(e.message); }
+}
+
+function doTransfer(){
+  toast('✅ Patient transferred to '+document.getElementById('tx-doctor').value);
+  closeModal('mTransfer');
+}
+
+// ─── LAB ───
+let labData = [];
+let labFilter = '';
+
+async function loadLab(){
+  try{
+    labData = await api(`/lab?search=${encodeURIComponent(labFilter)}`) || [];
+    renderLab();
+  }catch(e){ toast('Error loading lab: '+e.message); }
+}
+
+function renderLab(){
+  const tb = document.getElementById('labTB');
+  if(!tb) return;
+  tb.innerHTML = labData.map(r=>`
+    <tr>
+      <td><input type="checkbox"/></td>
+      <td class="td-link">${esc(r.test_num)}</td>
+      <td>${esc(r.patient)}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.pid)}</td>
+      <td>${esc(r.sex)}</td>
+      <td>${esc(r.mobile)}</td>
+      <td>${esc(r.age)}</td>
+      <td><span class="badge ${r.status==='Waiting'?'b-waiting':r.status==='Partially Collected'?'b-partial':'b-done'}">${esc(r.status)}</span></td>
+      <td>$${r.total_price.toFixed(2)}</td>
+      <td>
+        <button class="btn btn-teal btn-sm" onclick="collectSample('${r.test_num}')">Collect</button>
+        <button class="btn btn-outline btn-sm" onclick="deleteLab('${r.test_num}')">🗑</button>
+      </td>
+    </tr>`).join('');
+  document.getElementById('labPager').textContent = `${labData.length} rows`;
+}
+
+function filterLab(status){
+  labFilter = status;
+  loadLab();
+}
+
+async function collectSample(id){
+  try{
+    await api(`/lab/${id}/collect`,{method:'PUT'});
+    loadLab();
+    toast('✅ Sample collected!');
+  }catch(e){ toast(e.message); }
+}
+
+async function deleteLab(id){
+  if(!confirm('Delete this lab request?')) return;
+  try{
+    await api(`/lab/${id}`,{method:'DELETE'});
+    loadLab();
+    toast('✅ Deleted');
+  }catch(e){ toast(e.message); }
+}
+
+async function saveLab(){
+  const p = document.getElementById('ml-patient').value.trim();
+  if(!p){ toast('Patient name required'); return; }
+  const tests = [];
+  document.querySelectorAll('#labTestChecks input:checked').forEach(ch=>{
+    tests.push({name:ch.dataset.name, price:parseFloat(ch.dataset.price)});
+  });
+  const body = {
+    patient_name: p,
+    patient_id: document.getElementById('ml-id').value,
+    sex: document.getElementById('ml-sex').value,
+    age: document.getElementById('ml-age').value,
+    mobile: document.getElementById('ml-mobile').value,
+    tests
+  };
+  try{
+    await api('/lab',{method:'POST',body});
+    closeModal('mLabNew');
+    document.getElementById('ml-patient').value='';
+    document.getElementById('ml-id').value='';
+    document.getElementById('ml-age').value='';
+    document.getElementById('ml-mobile').value='';
+    document.querySelectorAll('#labTestChecks input').forEach(i=>i.checked=false);
+    loadLab();
+    toast('✅ Lab request submitted!');
+  }catch(e){ toast(e.message); }
+}
+
+function addLabTests(){
+  const tests = [];
+  document.querySelectorAll('#labReqChecks input:checked').forEach(ch=>{
+    tests.push({name:ch.dataset.name, price:parseFloat(ch.dataset.price)});
+  });
+  const tbody = document.getElementById('cf-labrows');
+  let total = 0;
+  tests.forEach(t=>{
+    if(tbody.innerHTML.includes('No lab tests added')) tbody.innerHTML='';
+    tbody.innerHTML += `<tr><td>${esc(t.name)}</td><td><span class="badge b-done">Available</span></td><td></td><td>${t.price.toFixed(2)}</td><td>0.00</td><td><button class="del-btn" onclick="this.closest('tr').remove()">🗑</button></td></tr>`;
+    total += t.price;
+  });
+  const cur = parseFloat(document.getElementById('cf-labtotal').textContent)||0;
+  document.getElementById('cf-labtotal').textContent = (cur+total).toFixed(2);
+  document.getElementById('cf-labcount').textContent = tbody.querySelectorAll('tr').length;
+  closeModal('mLabReq');
+  toast('✅ Tests added to form!');
+}
+
+// ─── PHARMACY ───
+let pharmData = [];
+let pharmFilter = '';
+
+async function loadPharmacy(){
+  try{
+    pharmData = await api(`/pharmacy?search=${encodeURIComponent(pharmFilter)}`) || [];
+    renderPharm();
+  }catch(e){ toast('Error loading pharmacy: '+e.message); }
+}
+
+function renderPharm(){
+  const tb = document.getElementById('pharmTB');
+  if(!tb) return;
+  let total = 0;
+  tb.innerHTML = pharmData.map(r=>{
+    total += r.total;
+    return `
+    <tr onclick="openPharmForm('${r.rx_num}')">
+      <td><input type="checkbox" onclick="event.stopPropagation()"/></td>
+      <td class="td-link">${esc(r.rx_num)}</td>
+      <td>${esc(r.patient)}</td>
+      <td style="font-size:11px;">${fmtDate(r.created_at)}</td>
+      <td>${esc(r.doctor_name)}</td>
+      <td>$${r.discount.toFixed(2)}</td>
+      <td>$${r.total.toFixed(2)}</td>
+      <td><span class="badge ${r.status==='Quotation'?'b-quotation':'b-done'}">${esc(r.status)}</span></td>
+      <td>
+        <button class="btn btn-green btn-sm" onclick="event.stopPropagation();dispenseRx('${r.rx_num}')">Dispense</button>
+        <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();deleteRx('${r.rx_num}')">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+  document.getElementById('pharmTotal').textContent = '$'+total.toFixed(2);
+  document.getElementById('pharmPager').textContent = `${pharmData.length} rows`;
+}
+
+function filterPharm(status){
+  pharmFilter = status;
+  loadPharmacy();
+}
+
+async function openPharmForm(id){
+  try{
+    const r = await api(`/pharmacy?search=${id}`);
+    const rx = r.find(x=>x.rx_num===id) || pharmData[0];
+    if(!rx) return;
+    currentRxId = rx.rx_num;
+    document.getElementById('pf-id').textContent = rx.rx_num;
+    document.getElementById('pf-num').textContent = rx.rx_num;
+    document.getElementById('pf-patient').textContent = rx.patient;
+    document.getElementById('pf-idnum').textContent = rx.pid || '—';
+    document.getElementById('pf-date').textContent = fmtDate(rx.created_at);
+    document.getElementById('pf-doctor').textContent = rx.doctor_name || '—';
+    
+    const items = await api(`/pharmacy/${rx.id}/items`);
+    const tbody = document.getElementById('pf-medrows');
+    let sub=0;
+    tbody.innerHTML = items.map(it=>{
+      const s = it.subtotal || 0;
+      sub += s;
+      return `<tr>
+        <td>${esc(it.brand_name)}</td><td></td>
+        <td>${esc(it.dosage_form)}</td>
+        <td>${esc(it.route)}</td>
+        <td>${esc(it.frequency)}</td>
+        <td>${it.dose||'—'}</td>
+        <td>${it.qty}</td>
+        <td>${it.available_qty}</td>
+        <td>${it.unit_price.toFixed(2)}</td>
+        <td>$${s.toFixed(2)}</td>
+        <td>$${s.toFixed(2)}</td>
+        <td><button class="del-btn" onclick="this.closest('tr').remove()">🗑</button></td>
+      </tr>`;
+    }).join('') || '<tr><td colspan="12" style="color:#aaa;font-style:italic;padding:8px 12px;">No medicines added</td></tr>';
+    document.getElementById('pf-sub').textContent = '$'+sub.toFixed(2);
+    document.getElementById('pf-total').textContent = sub.toFixed(2);
+    document.getElementById('pf-bal').textContent = sub.toFixed(2);
+    
+    document.querySelectorAll('#pg-pharmacy-form .sf-step').forEach(s=>s.classList.remove('active'));
+    if(rx.status==='Quotation') document.getElementById('pf-q').classList.add('active');
+    else if(rx.status==='Done') document.getElementById('pf-l').classList.add('active');
+    else document.getElementById('pf-s').classList.add('active');
+    
+    showPage('pharmacy-form');
+  }catch(e){ toast(e.message); }
+}
+
+async function dispenseRx(id){
+  try{
+    await api(`/pharmacy/${id}/dispense`,{method:'PUT'});
+    loadPharmacy();
+    toast('✅ Dispensed!');
+  }catch(e){ toast(e.message); }
+}
+
+async function deleteRx(id){
+  if(!confirm('Delete prescription?')) return;
+  try{
+    await api(`/pharmacy/${id}`,{method:'DELETE'});
+    loadPharmacy();
+    toast('✅ Deleted');
+  }catch(e){ toast(e.message); }
+}
+
+async function savePharm(){
+  const p = document.getElementById('pn-patient').value.trim();
+  if(!p){ toast('Patient name required'); return; }
+  const qty = parseFloat(document.getElementById('pn-qty').value)||1;
+  const price = parseFloat(document.getElementById('pn-price').value)||0;
+  const items = [{
+    brand_name: document.getElementById('pn-med').value || 'Unknown',
+    route: document.getElementById('pn-route').value,
+    frequency: document.getElementById('pn-freq').value,
+    qty: qty,
+    unit_price: price,
+    subtotal: qty*price
+  }];
+  const body = {
+    patient_name: p,
+    patient_id: document.getElementById('pn-id').value,
+    sex: document.getElementById('pn-sex').value,
+    age: document.getElementById('pn-age').value,
+    mobile: document.getElementById('pn-mobile').value,
+    doctor: document.getElementById('pn-doctor').value,
+    items
+  };
+  try{
+    await api('/pharmacy',{method:'POST',body});
+    closeModal('mPharmNew');
+    document.getElementById('pn-patient').value='';
+    document.getElementById('pn-id').value='';
+    document.getElementById('pn-med').value='';
+    document.getElementById('pn-qty').value='';
+    document.getElementById('pn-price').value='';
+    loadPharmacy();
+    toast('✅ Prescription saved!');
+  }catch(e){ toast(e.message); }
+}
+
+function addMedLine(){
+  const brand = document.getElementById('pf-brand').value.trim();
+  if(!brand){ toast('Brand name required'); return; }
+  const qty = parseFloat(document.getElementById('pf-qty').value)||1;
+  const price = parseFloat(document.getElementById('pf-uprice').value)||0;
+  const sub = qty*price;
+  const tbody = document.getElementById('pf-medrows');
+  if(tbody.innerHTML.includes('No medicines added')) tbody.innerHTML='';
+  tbody.innerHTML += `<tr>
+    <td>${esc(brand)}</td><td></td>
+    <td>${esc(document.getElementById('pf-dosage').value)}</td>
+    <td>${esc(document.getElementById('pf-route').value)}</td>
+    <td>${esc(document.getElementById('pf-freq').value)}</td>
+    <td>${document.getElementById('pf-dose').value||'—'}</td>
+    <td>${qty}</td>
+    <td>—</td>
+    <td>${price.toFixed(2)}</td>
+    <td>$${sub.toFixed(2)}</td>
+    <td>$${sub.toFixed(2)}</td>
+    <td><button class="del-btn" onclick="this.closest('tr').remove()">🗑</button></td>
+  </tr>`;
+  closeModal('mPharmForm');
+  document.getElementById('pf-brand').value='';
+  document.getElementById('pf-qty').value='';
+  document.getElementById('pf-uprice').value='';
+  toast('✅ Medicine added!');
+}
+
+function dispenseCurrentRx(){
+  if(currentRxId) dispenseRx(currentRxId);
+}
+
+// ─── DOCTORS ───
+let doctorData = [];
+let doctorFilter = '';
+
+async function loadDoctors(){
+  try{
+    doctorData = await api(`/appointments?search=${encodeURIComponent(doctorFilter)}`) || [];
+    renderDoctors();
+  }catch(e){ toast('Error loading doctors: '+e.message); }
+}
+
+function renderDoctors(){
+  const tb = document.getElementById('doctorTB');
+  if(!tb) return;
+  tb.innerHTML = doctorData.map(r=>`
+    <tr>
+      <td><input type="checkbox"/></td>
+      <td>${r.queue_num||'—'}</td>
+      <td class="td-link">${esc(r.appointment_num)}</td>
+      <td>${esc(r.patient)}</td>
+      <td style="color:var(--muted);font-size:11px;">${esc(r.pid)}</td>
+      <td>${esc(r.age)}</td>
+      <td>${esc(r.slot)}</td>
+      <td style="font-size:11px;">${fmtDate(r.in_date)}</td>
+      <td>${esc(r.type)}</td>
+      <td>${esc(r.appt_type)}</td>
+      <td style="font-size:11px;">${fmtDate(r.appt_date)}</td>
+      <td>${esc(r.doctor_name)}</td>
+      <td>${esc(r.branch)}</td>
+      <td><span class="badge ${r.payment_type==='Cash'?'b-cash':'b-free'}">${esc(r.payment_type)}</span></td>
+      <td><span class="badge ${r.status==='Waiting'?'b-waiting':'b-done'}">${esc(r.status)}</span></td>
+    </tr>`).join('');
+  document.getElementById('doctorPager').textContent = `${doctorData.length} rows`;
+}
+
+function filterDoctors(status){
+  doctorFilter = status;
+  loadDoctors();
+}
+
+async function saveDoctorAppt(){
+  const p = document.getElementById('da-patient').value.trim();
+  if(!p){ toast('Patient name required'); return; }
+  const body = {
+    patient_name: p,
+    patient_id: document.getElementById('da-id').value,
+    sex: document.getElementById('da-sex').value,
+    age: document.getElementById('da-age').value,
+    mobile: document.getElementById('da-mobile').value,
+    doctor: document.getElementById('da-doctor').value,
+    payment_type: document.getElementById('da-payment').value
+  };
+  try{
+    await api('/appointments',{method:'POST',body});
+    closeModal('mDoctorAppt');
+    document.getElementById('da-patient').value='';
+    document.getElementById('da-id').value='';
+    loadDoctors();
+    loadCashier();
+    toast('✅ Appointment created!');
+  }catch(e){ toast(e.message); }
+}
+
+// ─── PATIENTS ───
+async function loadPatients(){
+  try{
+    const data = await api('/patients') || [];
+    const tb = document.getElementById('patTB');
+    if(!tb) return;
+    tb.innerHTML = data.map(r=>`
+      <tr>
+        <td><input type="checkbox"/></td>
+        <td class="td-link">${esc(r.patient_id)}</td>
+        <td>${esc(r.full_name)}</td>
+        <td>${esc(r.sex)}</td>
+        <td>${esc(r.age)}</td>
+        <td>${esc(r.mobile)}</td>
+        <td>${esc(r.address)}</td>
+        <td>${esc(r.blood_type)}</td>
+        <td style="font-size:11px;">${fmtDate(r.created_at)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="deletePatient('${r.patient_id}')">🗑</button></td>
+      </tr>`).join('');
+    document.getElementById('patPager').textContent = `${data.length} patients`;
+  }catch(e){ toast(e.message); }
+}
+
+async function savePatient(){
+  const name = document.getElementById('pt-name').value.trim();
+  if(!name){ toast('Name required'); return; }
+  const body = {
+    patient_id: document.getElementById('pt-id').value,
+    full_name: name,
+    sex: document.getElementById('pt-sex').value,
+    age: document.getElementById('pt-age').value,
+    mobile: document.getElementById('pt-mobile').value,
+    address: document.getElementById('pt-addr').value,
+    blood_type: document.getElementById('pt-blood').value,
+    allergies: document.getElementById('pt-allergies').value
+  };
+  try{
+    await api('/patients',{method:'POST',body});
+    closeModal('mPatient');
+    ['pt-id','pt-name','pt-age','pt-mobile','pt-addr','pt-allergies'].forEach(id=>document.getElementById(id).value='');
+    loadPatients();
+    toast('✅ Patient registered!');
+  }catch(e){ toast(e.message); }
+}
+
+async function deletePatient(id){
+  if(!confirm('Delete patient?')) return;
+  try{
+    await api(`/patients/${id}`,{method:'DELETE'});
+    loadPatients();
+    toast('✅ Deleted');
+  }catch(e){ toast(e.message); }
+}
+
+// ─── INVENTORY ───
+async function loadInventory(){
+  try{
+    const data = await api('/inventory') || [];
+    const tb = document.getElementById('invTB');
+    if(!tb) return;
+    tb.innerHTML = data.map(r=>`
+      <tr>
+        <td><input type="checkbox"/></td>
+        <td>${esc(r.item_name)}</td>
+        <td>${esc(r.category)}</td>
+        <td>${r.qty}</td>
+        <td>$${r.unit_price.toFixed(2)}</td>
+        <td>${r.reorder_level}</td>
+        <td>${esc(r.supplier)}</td>
+        <td>${r.qty <= r.reorder_level ? '<span class="badge b-low">Low Stock</span>' : '<span class="badge b-done">OK</span>'}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="deleteItem('${r.id}')">🗑</button></td>
+      </tr>`).join('');
+    document.getElementById('invPager').textContent = `${data.length} items`;
+  }catch(e){ toast(e.message); }
+}
+
+function filterInventory(type){
+  toast('Filter: '+type+' (connect to backend with ?low_stock=1)');
+}
+
+async function saveInventory(){
+  const name = document.getElementById('inv-name').value.trim();
+  if(!name){ toast('Item name required'); return; }
+  const body = {
+    item_name: name,
+    category: document.getElementById('inv-cat').value,
+    qty: parseFloat(document.getElementById('inv-qty').value)||0,
+    unit_price: parseFloat(document.getElementById('inv-price').value)||0,
+    reorder_level: parseFloat(document.getElementById('inv-reorder').value)||10,
+    supplier: document.getElementById('inv-supplier').value
+  };
+  try{
+    await api('/inventory',{method:'POST',body});
+    closeModal('mInventory');
+    ['inv-name','inv-qty','inv-price','inv-reorder','inv-supplier'].forEach(id=>document.getElementById(id).value='');
+    loadInventory();
+    toast('✅ Item added!');
+  }catch(e){ toast(e.message); }
+}
+
+async function deleteItem(id){
+  if(!confirm('Delete item?')) return;
+  try{
+    await api(`/inventory/${id}`,{method:'DELETE'});
+    loadInventory();
+    toast('✅ Deleted');
+  }catch(e){ toast(e.message); }
+}
+
+// ─── REPORTS ───
+async function loadReports(){
+  try{
+    const stats = await api('/reports/dashboard');
+    document.getElementById('dash-appt').textContent = stats.today_appointments;
+    document.getElementById('dash-wait').textContent = stats.waiting_patients;
+    document.getElementById('dash-sales').textContent = '$'+stats.today_sales.toFixed(2);
+    document.getElementById('dash-stock').textContent = stats.low_stock;
+    document.getElementById('dash-lab').textContent = stats.today_lab;
+    document.getElementById('dash-rx').textContent = stats.pending_rx;
+    document.getElementById('dash-pat').textContent = stats.total_patients;
+    document.getElementById('dash-doc').textContent = stats.total_doctors;
+    
+    const rev = await api('/reports/revenue?period=daily');
+    const revChart = document.getElementById('revChart');
+    const maxRev = Math.max(...rev.map(r=>r.value),1);
+    revChart.innerHTML = rev.slice(0,7).reverse().map(r=>{
+      const h = (r.value/maxRev)*120;
+      return `<div class="bar" style="height:${h}px"><div class="bar-val">$${Math.round(r.value)}</div><div class="bar-label">${r.label.slice(5)}</div></div>`;
+    }).join('');
+    
+    const doc = await api('/reports/appointments-by-doctor');
+    const docChart = document.getElementById('docChart');
+    const maxDoc = Math.max(...doc.map(r=>r.value),1);
+    docChart.innerHTML = doc.map(r=>{
+      const h = (r.value/maxDoc)*120;
+      return `<div class="bar" style="height:${h}px"><div class="bar-val">${r.value}</div><div class="bar-label">${r.label.slice(0,10)}</div></div>`;
+    }).join('');
+  }catch(e){ toast(e.message); }
+}
+
+// ─── USERS ───
+async function loadUsers(){
+  try{
+    const data = await api('/users') || [];
+    const tb = document.getElementById('userTB');
+    if(!tb) return;
+    tb.innerHTML = data.map(r=>`
+      <tr>
+        <td><input type="checkbox"/></td>
+        <td>${esc(r.full_name)}</td>
+        <td>${esc(r.email)}</td>
+        <td><span class="badge b-scheduled">${esc(r.role)}</span></td>
+        <td>${esc(r.branch)}</td>
+        <td>${r.active?'<span class="badge b-done">Active</span>':'<span class="badge b-cancelled">Inactive</span>'}</td>
+        <td style="font-size:11px;">${fmtDate(r.created_at)}</td>
+        <td><button class="btn btn-outline btn-sm" onclick="toggleUser('${r.id}',${!r.active})">${r.active?'Deactivate':'Activate'}</button></td>
+      </tr>`).join('');
+  }catch(e){ toast(e.message); }
+}
+
+async function saveUser(){
+  const name = document.getElementById('usr-name').value.trim();
+  const email = document.getElementById('usr-email').value.trim();
+  const pass = document.getElementById('usr-pass').value;
+  if(!name||!email||!pass){ toast('All fields required'); return; }
+  const body = {
+    full_name: name,
+    email: email,
+    password: pass,
+    role: document.getElementById('usr-role').value,
+    branch: document.getElementById('usr-branch').value
+  };
+  try{
+    await api('/users',{method:'POST',body});
+    closeModal('mUser');
+    ['usr-name','usr-email','usr-pass'].forEach(id=>document.getElementById(id).value='');
+    loadUsers();
+    toast('✅ User created!');
+  }catch(e){ toast(e.message); }
+}
+
+async function toggleUser(id, active){
+  try{
+    await api(`/users/${id}`,{method:'PUT',body:{active}});
+    loadUsers();
+    toast('✅ User updated');
+  }catch(e){ toast(e.message); }
+}
+
+// ─── UTILITIES ───
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+
+function toast(msg){
+  const el = document.getElementById('toastEl');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 3000);
+}
+
+function searchTable(tbodyId, term){
+  const rows = document.getElementById(tbodyId).querySelectorAll('tr');
+  const lower = term.toLowerCase();
+  rows.forEach(row=>{
+    const text = row.textContent.toLowerCase();
+    row.style.display = text.includes(lower)?'':'none';
+  });
+}
+
+function toggleAll(tbodyId, chk){
+  document.getElementById(tbodyId).querySelectorAll('input[type="checkbox"]').forEach(c=>c.checked=chk.checked);
+}
+
+function esc(str){
+  if(!str) return '—';
+  const div = document.createElement('div');
+  div.textContent = String(str);
+  return div.innerHTML;
+}
+
+function fmtDate(d){
+  if(!d) return '—';
+  const date = new Date(d);
+  return date.toLocaleString('en-GB');
+}
+
+function exportTable(tbodyId, name){
+  const rows = document.getElementById(tbodyId).querySelectorAll('tr');
+  let csv = '';
+  rows.forEach(r=>{
+    if(r.style.display==='none') return;
+    const cells = r.querySelectorAll('td');
+    const line = Array.from(cells).map(c=>'"'+c.textContent.replace(/"/g,'""')+'"').join(',');
+    csv += line+'\n';
+  });
+  const blob = new Blob([csv],{type:'text/csv'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${name}_export_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function printReceipt(){
+  const apptId = document.getElementById('cf-id').textContent;
+  const patient = document.getElementById('cf-patient').textContent;
+  const pid = document.getElementById('cf-idnum').textContent;
+  const date = document.getElementById('cf-date').textContent;
+  const doctor = document.getElementById('cf-doctor').textContent;
+  const age = document.getElementById('cf-age').textContent;
+  
+  let labHTML = '';
+  const labRows = document.getElementById('cf-labrows');
+  if(labRows && !labRows.innerHTML.includes('No lab tests added')){
+    labHTML = Array.from(labRows.querySelectorAll('tr')).map(tr=>{
+      const cells = tr.querySelectorAll('td');
+      return `<tr><td>${cells[0]?.textContent||''}</td><td>${cells[3]?.textContent||''}</td><td>${cells[4]?.textContent||''}</td></tr>`;
+    }).join('');
+  }
+  
+  document.getElementById('printArea').innerHTML = `
+    <div class="rx-print">
+      <div class="rx-logo">
+        <svg viewBox="0 0 52 52" width="50" height="50"><circle cx="18" cy="34" r="16" fill="#4caf50" opacity=".85"/><circle cx="34" cy="18" r="16" fill="#1a3a6b" opacity=".85"/><text x="10" y="42" font-size="22" font-weight="bold" fill="#fff" font-family="Arial">B</text></svg>
+        <div><h1 style="font-size:22px;font-weight:900;color:#1a3a6b;font-family:Arial;">BAXNAANO HOSPITAL</h1><p style="font-size:11px;color:#6b7280;">Zoobe, Kasoo Horjeedka Hayat Market, Mogadishu-Somalia<br/>Tel: +252613490055 / +252613490066</p></div>
+      </div>
+      <hr class="rx-hr"/>
+      <div style="text-align:center;font-weight:700;font-size:14px;margin-bottom:10px;">CASHIER RECEIPT</div>
+      <div class="rx-grid">
+        <span>Patient Name:</span><strong>${patient}</strong>
+        <span>Patient ID#:</span><strong>${pid}</strong>
+        <span>Age:</span><strong>${age}</strong>
+        <span>Appointment #:</span><strong>${apptId}</strong>
+        <span>Date:</span><strong>${date}</strong>
+        <span>Doctor:</span><strong>${doctor}</strong>
+      </div>
+      <hr class="rx-hr2"/>
+      <table class="rx-table">
+        <thead><tr><th>Procedure</th><th>Unit Price</th><th>Discount</th></tr></thead>
+        <tbody>${labHTML||'<tr><td colspan="3">No procedures</td></tr>'}</tbody>
+      </table>
+      <hr class="rx-hr2"/>
+      <div class="rx-footer">
+        Report printed by system on ${new Date().toLocaleString()}<br/>
+        Baxnaano Hospital Management System v1.0
+      </div>
+    </div>`;
+  window.print();
+}
+
+function printRx(){
+  const rx = document.getElementById('pf-id').textContent;
+  const patient = document.getElementById('pf-patient').textContent;
+  document.getElementById('printArea').innerHTML = `
+    <div class="rx-print">
+      <h2>Prescription ${rx}</h2>
+      <p>Patient: ${patient}</p>
+      <p>Printed: ${new Date().toLocaleString()}</p>
+    </div>`;
+  window.print();
+}
+
+function editAppointment(){ toast('Edit mode: update fields and save'); }
+function deleteAppointment(){ if(currentApptId) deleteAppt(currentApptId); }
+function refundPayment(){ toast('Refund processed (demo)'); }
+function recallPatient(){ toast('Patient recalled to queue'); }
+function editRx(){ toast('Edit mode activated'); }
+function discardRx(){ toast('Changes discarded'); }
+function saveSettings(){ toast('✅ Settings saved!'); }
+function showPayments(){ toast('Payments panel'); }
+
+// Close modals on outside click
+document.querySelectorAll('.modal-bg').forEach(bg=>{
+  bg.addEventListener('click', e=>{ if(e.target===bg) bg.classList.remove('open'); });
+});
+
+// Init
+checkAuth();
+</script>
+</body>
+</html>
