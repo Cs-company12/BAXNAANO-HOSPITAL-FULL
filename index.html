@@ -723,13 +723,20 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
     <div class="modal-header"><h3><i class="bi bi-cash-coin"></i> Bixinta Dawada — Qaadista Lacagta</h3>
       <button class="modal-close" onclick="PharmUI.closeDispense()">&times;</button></div>
     <div class="modal-body">
-      <div class="payment-info"><div class="pi-row"><span>Bukaanka</span><span id="dspPatient">--</span></div><div class="pi-row"><span>Dhakhtarka Qoray</span><span id="dspDoctor">--</span></div></div>
+      <div class="payment-info">
+        <div class="pi-row"><span>Bukaanka</span><span id="dspPatient">--</span></div>
+        <div class="pi-row"><span>Da'da / Jinsi / Tel</span><span id="dspPatientMeta">--</span></div>
+        <div class="pi-row"><span>Dhakhtarka Qoray</span><span id="dspDoctor">--</span></div>
+        <div class="pi-row"><span>Invoice #</span><span id="dspInvoiceNo">--</span></div>
+      </div>
       <input type="hidden" id="dspRxId">
       <div class="tbl-wrap" style="margin-top:.7rem;"><table class="dtable" id="dspTable">
         <thead><tr><th>Dawo</th><th>La Codsaday</th><th>Xoogga Haray</th><th>Tirada la Siinayo</th><th>Qiimo (hal)</th><th>Wadar</th></tr></thead>
         <tbody id="dspTbody"></tbody>
       </table></div>
       <div class="payment-info" style="margin-top:.6rem;">
+        <div class="pi-row"><span>Wadarta Hoose</span><span id="dspSubtotal">$0.00</span></div>
+        <div class="pi-row"><span>Dhimis ($)</span><input id="dspDiscount" type="number" min="0" step="0.01" value="0" class="form-control" style="width:100px;padding:3px 8px;text-align:right;display:inline-block;" oninput="PharmUI.updateDispenseTotal()"></div>
         <div class="pi-row pi-total"><span>Wadarta Guud (Lacagta la qaadi doono)</span><strong id="dspTotal">$0.00</strong></div>
       </div>
       <div class="form-grid-2" style="margin-top:.7rem;">
@@ -2050,7 +2057,10 @@ const PharmUI = {
     $('dspPatient').textContent = r.patientName;
     $('dspDoctor').textContent = r.doctor||'—';
     $('dspPayType').value = 'Cash';
+    $('dspDiscount').value = '0';
+    $('dspInvoiceNo').textContent = 'PH-'+String(Date.now()).slice(-6);
     const patient = ls_get(K.PATIENTS).find(p=>p.id===r.patientId);
+    $('dspPatientMeta').textContent = `${(patient&&patient.age)||'—'} y · ${(patient&&patient.sex)||'—'} · ${(patient&&patient.mobile)||r.phone||'—'}`;
     $('dspCustName').value = r.patientName;
     $('dspCustPhone').value = (patient && patient.mobile) || r.phone || '';
     this.toggleDispenseCredit();
@@ -2081,7 +2091,7 @@ const PharmUI = {
     $('dspCustPhoneWrap').style.display = isCredit?'':'none';
   },
   updateDispenseTotal(){
-    let total = 0;
+    let subtotal = 0;
     document.querySelectorAll('#dspTbody tr').forEach(tr=>{
       const price = parseFloat(tr.dataset.price)||0;
       const max = parseInt(tr.querySelector('.dsp-qty').max)||0;
@@ -2091,9 +2101,11 @@ const PharmUI = {
       if(qty<0){ qty=0; qtyInput.value=0; }
       const lineTotal = price*qty;
       tr.querySelector('.dsp-line-total').textContent = fmtMoney(lineTotal);
-      total += lineTotal;
+      subtotal += lineTotal;
     });
-    $('dspTotal').textContent = fmtMoney(total);
+    const discount = Math.max(0, Math.min(parseFloat($('dspDiscount').value)||0, subtotal));
+    $('dspSubtotal').textContent = fmtMoney(subtotal);
+    $('dspTotal').textContent = fmtMoney(subtotal - discount);
   },
   confirmDispense(){
     const rxId = $('dspRxId').value;
@@ -2122,10 +2134,13 @@ const PharmUI = {
     items.forEach(it=>{ const p=products.find(x=>x.id===it.id); p.qty -= it.qty; });
     ls_set(K.PHARM_PROD, products);
 
-    const total = items.reduce((s,it)=>s+it.price*it.qty,0);
+    const subtotal = items.reduce((s,it)=>s+it.price*it.qty,0);
+    const discount = Math.max(0, Math.min(parseFloat($('dspDiscount').value)||0, subtotal));
+    const total = subtotal - discount;
     const profit = total - items.reduce((s,it)=>s+it.cost*it.qty,0);
-    const sale = { id:gid('PS'), date:new Date().toISOString(), total, profit, payment:payType, user:APP.user.username,
-      rxId:r.id, patientName:r.patientName, doctor:r.doctor,
+    const patient = ls_get(K.PATIENTS).find(p=>p.id===r.patientId);
+    const sale = { id:gid('PS'), receiptNo:$('dspInvoiceNo').textContent, date:new Date().toISOString(), subtotal, discount, total, profit, payment:payType, user:APP.user.username,
+      rxId:r.id, patientName:r.patientName, patientAge:(patient&&patient.age)||'', patientSex:(patient&&patient.sex)||'', doctor:r.doctor,
       items: items.map(it=>({id:it.id,name:it.name,qty:it.qty,price:it.price,cost:it.cost})) };
     if(payType==='Credit'){
       sale.customer=custName; sale.phone=custPhone;
@@ -2153,10 +2168,14 @@ const PharmUI = {
     const rows = sale.items.map(it=>`<tr><td>${sanitize(it.name)}</td><td>${it.qty}</td><td>${fmtMoney(it.price)}</td><td>${fmtMoney(it.price*it.qty)}</td></tr>`).join('');
     const body = `
       <div class="ph-section-title">Rasiidka Dawada — Farmashiga</div>
+      <div class="ph-info-row"><span>Invoice #</span><b>${sanitize(sale.receiptNo||sale.id.slice(-8))}</b></div>
       <div class="ph-info-row"><span>Bukaanka</span><b>${sanitize(sale.patientName)}</b></div>
+      ${(sale.patientAge||sale.patientSex)?`<div class="ph-info-row"><span>Da'da / Jinsi</span><b>${sanitize(String(sale.patientAge||'—'))} · ${sanitize(sale.patientSex||'—')}</b></div>`:''}
       <div class="ph-info-row"><span>Dhakhtarka Qoray</span><b>${sanitize(sale.doctor||'—')}</b></div>
       ${sale.customer?`<div class="ph-info-row"><span>Macmiil (Deyn)</span><b>${sanitize(sale.customer)} — ${sanitize(sale.phone||'')}</b></div>`:''}
       <table><thead><tr><th>Dawo</th><th>T</th><th>Qiimo</th><th>Wadar</th></tr></thead><tbody>${rows}</tbody></table>
+      ${sale.discount>0?`<div class="ph-info-row" style="margin-top:6px;"><span>Wadarta Hoose</span><b>${fmtMoney(sale.subtotal)}</b></div>
+      <div class="ph-info-row"><span>Dhimis</span><b>-${fmtMoney(sale.discount)}</b></div>`:''}
       <div class="ph-total-row"><span>TOTAL</span><span>${fmtMoney(sale.total)}</span></div>
       <div class="ph-info-row"><span>Habka Bixinta</span><span class="ph-badge" style="${sale.payment==='Credit'?'background:#fff3cd;color:#856404;':''}">${sale.payment==='Credit'?'Deyn (Credit)':'Cash'}</span></div>
       <div class="ph-info-row"><span>Bixiyay</span><b>${sanitize(sale.user)}</b></div>
@@ -2207,7 +2226,7 @@ const PharmUI = {
     ls_set(K.PHARM_PROD, products);
     const total = this.cart.reduce((s,c)=>s+c.price*c.qty,0);
     const profit = total - this.cart.reduce((s,c)=>s+(c.cost||0)*c.qty,0);
-    const sale = { id:gid('PS'), date:new Date().toISOString(), total, profit, payment:payType, user:APP.user.username,
+    const sale = { id:gid('PS'), receiptNo:'PH-'+String(Date.now()).slice(-6), date:new Date().toISOString(), total, profit, payment:payType, user:APP.user.username,
       items:this.cart.map(c=>({id:c.id,name:c.name,qty:c.qty,price:c.price,cost:c.cost||0})) };
     if(payType==='Credit'){
       sale.customer=custName; sale.phone=custPhone;
@@ -2220,6 +2239,7 @@ const PharmUI = {
     const rows = sale.items.map(it=>`<tr><td>${sanitize(it.name)}</td><td>${it.qty}</td><td>${fmtMoney(it.price)}</td><td>${fmtMoney(it.price*it.qty)}</td></tr>`).join('');
     const body = `
       <div class="ph-section-title">Rasiidka Farmashiga — POS</div>
+      <div class="ph-info-row"><span>Invoice #</span><b>${sanitize(sale.receiptNo)}</b></div>
       ${sale.customer?`<div class="ph-info-row"><span>Macmiil</span><b>${sanitize(sale.customer)}</b></div>`:''}
       <div class="ph-info-row"><span>Cashier</span><b>${sanitize(sale.user)}</b></div>
       <table><thead><tr><th>Dawo</th><th>T</th><th>Qiimo</th><th>Wadar</th></tr></thead><tbody>${rows}</tbody></table>
@@ -2283,7 +2303,7 @@ const PharmUI = {
 
   renderSales(){
     const sales = ls_get(K.PHARM_SALES).slice().reverse();
-    $('phSalesTbody').innerHTML = sales.map(s=>`<tr><td>${s.id.slice(-8)}</td><td>${fmtDT(s.date)}</td><td>${s.payment}</td><td>${fmtMoney(s.total)}</td><td style="color:var(--green);">${fmtMoney(s.profit||0)}</td><td>${sanitize(s.user)}</td></tr>`).join('');
+    $('phSalesTbody').innerHTML = sales.map(s=>`<tr><td>${sanitize(s.receiptNo||s.id.slice(-8))}</td><td>${fmtDT(s.date)}</td><td>${s.payment}</td><td>${fmtMoney(s.total)}</td><td style="color:var(--green);">${fmtMoney(s.profit||0)}</td><td>${sanitize(s.user)}</td></tr>`).join('');
   }
 };
 
