@@ -1872,8 +1872,8 @@ const DocUI = {
       <div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
         <div><strong style="font-size:1rem;color:var(--primary-dark);">${sanitize(p.name)}</strong>
           <div style="font-size:12px;color:var(--primary-light);">Da'da: ${p.age||'—'} | Jinsi: ${p.sex||'—'} | Tel: ${sanitize(p.mobile||'—')}</div></div>
-        <button class="btn btn-success btn-sm" onclick="DocUI.startFollowupVisit('${p.id}')">
-          <i class="bi bi-person-plus-fill"></i> Bilow Booqasho Cusub (Number La'aan)</button>
+        ${isAdmin ? '<span class="badge badge-secondary"><i class="bi bi-eye"></i> Admin — Daawayn Ma Aha (View Only)</span>' : `<button class="btn btn-success btn-sm" onclick="DocUI.startFollowupVisit('${p.id}')">
+          <i class="bi bi-person-plus-fill"></i> Bilow Booqasho Cusub (Number La'aan)</button>`}
       </div></div>`;
 
     if(!visits.length){
@@ -1896,7 +1896,7 @@ const DocUI = {
             <div class="form-section-title" style="margin-bottom:.3rem;">${fmtDate(v.apptDate)} — ${sanitize(v.doctor||'')}</div>
             <div style="display:flex;gap:5px;align-items:center;">
               <span class="badge badge-secondary">${sanitize(v.department||v.apptType||'')}</span>
-              <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:10.5px;" onclick="DocUI.reopenVisit('${v.id}')"><i class="bi bi-pencil-square"></i> Wax ka beddel</button>
+              ${isAdmin ? '' : `<button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:10.5px;" onclick="DocUI.reopenVisit('${v.id}')"><i class="bi bi-pencil-square"></i> Wax ka beddel</button>`}
             </div>
           </div>
           <div style="font-size:12.5px;margin-bottom:4px;"><b>Taariikhda:</b> ${sanitize(v.history||'—')}</div>
@@ -1914,6 +1914,7 @@ const DocUI = {
      dhigantaa "follow-up bilaash ah" oo dhakhtarku si toos ah u furi
      karo. ---- */
   startFollowupVisit(patientId){
+    if(APP.user.role==='admin'){ Swal.fire({icon:'warning', title:'Admin ma bilaabi karo booqasho', text:'Kaliya dhakhtarku wuu bilaabi karaa booqasho cusub — admin waa view-only.'}); return; }
     const p = ls_get(K.PATIENTS).find(x=>x.id===patientId); if(!p) return;
     const doctorName = (APP.user.role==='doctor' && APP.user.doctorName) ? APP.user.doctorName : (allDoctorNames()[0]||'');
     const appts = ls_get(K.APPTS);
@@ -1933,8 +1934,10 @@ const DocUI = {
 
   /* ---- Fur mar kale booqasho hore (xitaa haddii horey loo dhammeeyay) —
      dhakhtarku wuxuu ku dari karaa fiiro/dawo/baaritaan dheeraad ah,
-     xitaa haddii number-kii hore la isticmaalay. ---- */
+     xitaa haddii number-kii hore la isticmaalay. Admin waa view-only —
+     ma bedeli karo diiwaanka caafimaad si loo ilaaliyo sax-diinta xogta. ---- */
   reopenVisit(apptId){
+    if(APP.user.role==='admin'){ Swal.fire({icon:'warning', title:'Admin ma wax ka beddeli karo booqasho', text:'Kaliya dhakhtarka lahaanshaha booqashadan ayaa wax ka beddeli kara — admin waa view-only.'}); return; }
     const a = ls_get(K.APPTS).find(x=>x.id===apptId); if(!a) return;
     this.showTab('queue');
     this.openPatient(apptId);
