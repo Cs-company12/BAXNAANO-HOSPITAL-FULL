@@ -634,6 +634,7 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
         <div><div style="font-size:.7rem;text-transform:uppercase;color:var(--text-muted);">Appt #</div><div style="font-weight:700;" id="apptNumDisp">/</div></div>
         <div class="queue-display"><div class="queue-label">Queue #</div><div class="queue-num" id="apptQueueDisp">0</div></div>
       </div>
+      <div id="apptConsultSummary" class="alert alert-info d-none" style="font-size:12.3px;"></div>
       <div class="form-grid-2">
         <div>
           <div class="form-group ac-wrap" style="margin-bottom:.7rem;"><label>Magaca Bukaanka <span class="req">*</span></label>
@@ -1149,6 +1150,7 @@ const ApptUI = {
     $('aChargeAmt').textContent='$0.00'; $('aTotalAmt').textContent='$0.00';
     $('btnApptWA').style.display='none'; $('btnApptPrint').style.display='none'; $('btnApptPay').style.display='none';
     $('apptStateBadge').textContent='DRAFT'; $('apptStateBadge').className='badge badge-secondary';
+    $('apptConsultSummary').classList.add('d-none'); $('apptConsultSummary').innerHTML='';
 
     if(id){
       const a = ls_get(K.APPTS).find(x=>x.id===id);
@@ -1171,6 +1173,20 @@ const ApptUI = {
       } else {
         $('apptStateBadge').textContent='DRAFT'; $('apptStateBadge').className='badge badge-warning';
         $('btnApptPay').style.display='';
+      }
+      // Xaaladda Booqashada — si Reception/Admin ay dhammaan xogta uga arki
+      // karaan hal meel: diagnosis-ka dhakhtarku qoray, xaalada dawada
+      // (Farmashiga), iyo xaalada baaritaanada shaybaarka.
+      if(a.consulted){
+        const rx = ls_get(K.RX).find(r=>r.apptId===a.id);
+        const lab = ls_get(K.LABREQ).find(r=>r.apptId===a.id);
+        let info = `<b>Xaaladda Booqashada:</b> ${sanitize(a.diagnosis||'Diagnosis lama gelin')}`;
+        if(a.history) info += ` <span class="text-muted">(${sanitize(a.history)})</span>`;
+        info += '<br>';
+        info += rx ? `Dawo: <span class="badge ${rx.status==='dispensed'?'badge-success':'badge-warning'}">${rx.status==='dispensed'?'La bixiyay Farmashiga':'Sugaya Farmashiga'}</span> &nbsp; ` : '<span class="text-muted">Dawo lama qorin.</span> &nbsp; ';
+        info += lab ? `Lab: <span class="badge ${lab.status==='completed'?'badge-success':'badge-warning'}">${lab.status==='completed'?'Natiijo Dhammaystiran':'Sugaya Shaybaarka'}</span>` : '<span class="text-muted">Baaritaan lab lama codsan.</span>';
+        $('apptConsultSummary').innerHTML = info;
+        $('apptConsultSummary').classList.remove('d-none');
       }
     } else {
       $('apptModalTitle').innerHTML = '<i class="bi bi-calendar-plus"></i> Ballan Cusub';
@@ -1491,6 +1507,7 @@ const DocUI = {
     const panelOpts = Object.keys(TEST_TEMPLATES).map(t=>`<option value="panel:${t}">${t} — Xirmo (${TEST_TEMPLATES[t].length} qodob)</option>`).join('');
     const singleOpts = DEFAULT_LAB_TESTS.map(t=>`<option value="single:${t}">${t}</option>`).join('');
     div.innerHTML = `<select class="form-select lab-test-name" style="flex:1;">
+        <option value="">-- Dooro Baaritaan/Xirmo --</option>
         <optgroup label="Xirmooyin (Panels — dhowr qodob)">${panelOpts}</optgroup>
         <optgroup label="Baaritaano Kaligood (hal natiijo)">${singleOpts}</optgroup>
       </select>
@@ -1522,14 +1539,15 @@ const DocUI = {
     }
 
     const tests = Array.from(document.querySelectorAll('.lab-test-row')).map(r=>{
-      const raw = r.querySelector('.lab-test-name').value; // "panel:CBC" ama "single:Malaria"
+      const raw = r.querySelector('.lab-test-name').value; // "panel:CBC" ama "single:Malaria" ama "" (aan la dooranin)
+      if(!raw) return null;
       const sep = raw.indexOf(':');
       const type = raw.slice(0,sep), name = raw.slice(sep+1);
       const params = type==='panel' ? TEST_TEMPLATES[name].map(p=>({...p})) : [{name:name, unit:'', range:''}];
       return { id:gid('T'), testName:name, isPanel:type==='panel', params,
         results: params.map(p=>({name:p.name, unit:p.unit, range:p.range, value:''})),
         status:'pending', technician:'', resultDate:'', notes:'' };
-    });
+    }).filter(t=>t!==null);
     if(tests.length){
       const reqs = ls_get(K.LABREQ);
       reqs.unshift({ id:gid('LR'), apptId:a.id, patientId:a.patientId, patientName:a.patientName, phone:a.mobile,
