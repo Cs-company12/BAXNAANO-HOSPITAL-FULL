@@ -83,14 +83,16 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 
 /* CARDS / STATS */
-.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:1rem;}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:1rem;transition:box-shadow .18s,transform .18s;}
+.card:hover{box-shadow:0 6px 20px rgba(113,75,103,.12);}
 .card-header{padding:.7rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;
   flex-wrap:wrap;gap:.5rem;background:#fafafa;}
 .card-title{font-size:.85rem;font-weight:700;color:var(--text);display:flex;align-items:center;gap:7px;}
 .card-title i{color:var(--primary-light);}
 .card-body{padding:.85rem 1rem;}
 .stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.75rem;margin-bottom:1rem;}
-.stat-box{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:.8rem 1rem;box-shadow:var(--shadow);}
+.stat-box{background:#fff;border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:var(--radius);padding:.8rem 1rem;box-shadow:var(--shadow);transition:transform .18s,box-shadow .18s;}
+.stat-box:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(113,75,103,.14);}
 .stat-box small{font-size:.68rem;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted);font-weight:600;}
 .stat-box .val{font-size:1.5rem;font-weight:800;color:var(--primary);margin-top:.2rem;}
 .stat-box .val.green{color:var(--green);} .stat-box .val.red{color:var(--red);} .stat-box .val.orange{color:var(--orange);}
@@ -155,6 +157,16 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
 .ac-item .sub{font-size:11px;color:var(--text-muted);}
 .ac-action{padding:7px 12px;cursor:pointer;font-size:12px;color:var(--primary);}
 .ac-action:hover{background:#fdf7f9;}
+
+/* GLOBAL SEARCH (topbar) */
+.topbar-search-wrap{position:relative;}
+.global-search-panel{position:absolute;top:120%;right:0;width:320px;max-width:88vw;background:#fff;border:1px solid var(--border);
+  border-radius:8px;box-shadow:0 14px 34px rgba(0,0,0,.22);padding:11px;z-index:1500;color:var(--text);}
+.gs-result-item{padding:8px 9px;border-radius:5px;cursor:pointer;font-size:12.4px;border-bottom:1px solid #f2f2f2;transition:background .12s;}
+.gs-result-item:hover{background:var(--primary-xlight);}
+.gs-result-item:last-child{border-bottom:none;}
+.topbar-avatar{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.22);display:inline-flex;
+  align-items:center;justify-content:center;font-weight:800;font-size:11px;margin-right:6px;vertical-align:middle;}
 
 /* MODAL */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;justify-content:center;align-items:center;padding:16px;}
@@ -241,7 +253,14 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
     <div class="topbar-logo"><div class="circle">B</div><span class="txt">BAXNAANO HMS</span></div>
     <div class="topnav" id="topNav"></div>
     <div class="topbar-right">
-      <span class="topbar-user" id="userDisp"></span>
+      <div class="topbar-search-wrap">
+        <button class="topbar-logout" id="btnGlobalSearch" title="Raadi bukaan (xog-baar)"><i class="bi bi-search"></i></button>
+        <div id="globalSearchPanel" class="global-search-panel" style="display:none;">
+          <input id="globalSearchInput" class="form-control" placeholder="Raadi magac ama telefoon..." style="margin-bottom:6px;">
+          <div id="globalSearchResults"></div>
+        </div>
+      </div>
+      <span class="topbar-user"><span class="topbar-avatar" id="userAvatar">--</span><span id="userDisp"></span></span>
       <button class="topbar-logout" id="logoutBtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
     </div>
   </div>
@@ -699,6 +718,37 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
   </div>
 </div>
 
+<div id="modalDispense" class="modal-overlay">
+  <div class="modal-box wide">
+    <div class="modal-header"><h3><i class="bi bi-cash-coin"></i> Bixinta Dawada — Qaadista Lacagta</h3>
+      <button class="modal-close" onclick="PharmUI.closeDispense()">&times;</button></div>
+    <div class="modal-body">
+      <div class="payment-info"><div class="pi-row"><span>Bukaanka</span><span id="dspPatient">--</span></div><div class="pi-row"><span>Dhakhtarka Qoray</span><span id="dspDoctor">--</span></div></div>
+      <input type="hidden" id="dspRxId">
+      <div class="tbl-wrap" style="margin-top:.7rem;"><table class="dtable" id="dspTable">
+        <thead><tr><th>Dawo</th><th>La Codsaday</th><th>Xoogga Haray</th><th>Tirada la Siinayo</th><th>Qiimo (hal)</th><th>Wadar</th></tr></thead>
+        <tbody id="dspTbody"></tbody>
+      </table></div>
+      <div class="payment-info" style="margin-top:.6rem;">
+        <div class="pi-row pi-total"><span>Wadarta Guud (Lacagta la qaadi doono)</span><strong id="dspTotal">$0.00</strong></div>
+      </div>
+      <div class="form-grid-2" style="margin-top:.7rem;">
+        <div class="form-group"><label>Habka Bixinta</label>
+          <select id="dspPayType" class="form-select" onchange="PharmUI.toggleDispenseCredit()">
+            <option value="Cash">Cash</option><option value="Credit">Deyn (Credit)</option>
+          </select></div>
+        <div></div>
+        <div class="form-group" id="dspCustNameWrap" style="display:none;"><label>Magaca Macmiilka</label><input id="dspCustName" class="form-control"></div>
+        <div class="form-group" id="dspCustPhoneWrap" style="display:none;"><label>Telefoonka</label><input id="dspCustPhone" class="form-control"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-light" onclick="PharmUI.closeDispense()">Jooji</button>
+      <button class="btn btn-success" id="btnConfirmDispense"><i class="bi bi-printer"></i> Xaqiiji Bixinta &amp; Print</button>
+    </div>
+  </div>
+</div>
+
 <div id="modalLabResult" class="modal-overlay">
   <div class="modal-box wide">
     <div class="modal-header"><h3><i class="bi bi-clipboard2-pulse"></i> Geli Natiijooyinka Shaybaarka</h3><button class="modal-close" onclick="LabUI.closeResultModal()">&times;</button></div>
@@ -828,6 +878,47 @@ function doPrint(html){
   setTimeout(()=>{ w.print(); }, 250);
 }
 
+/* Qaab print oo caadi ah — logo/magaca isbitalka + xariiq hoose oo leh
+   telefoon/cinwaan — dhammaan receipts-ka (POS, dispensing, appointment
+   ticket, lab result) waxay isticmaalaan hal "brand" si loo helo muuqaal
+   qurxoon oo isku mid ah nidaamka oo dhan. */
+function printWrapper(title, bodyHtml, opts){
+  opts = opts || {};
+  const maxWidth = opts.maxWidth || '380px';
+  return `<html><head><title>${title}</title><meta charset="UTF-8"><style>
+    *{box-sizing:border-box;}
+    body{font-family:'Segoe UI',Arial,sans-serif;max-width:${maxWidth};margin:16px auto;color:#222;font-size:12.5px;line-height:1.45;}
+    .ph-header{display:flex;align-items:center;gap:10px;border-bottom:3px solid #714B67;padding-bottom:9px;margin-bottom:12px;}
+    .ph-logo{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#714B67,#17a2b8);
+      display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:21px;flex-shrink:0;}
+    .ph-name{font-size:18px;font-weight:900;color:#714B67;line-height:1;letter-spacing:.5px;}
+    .ph-sub{font-size:10px;font-weight:700;color:#17a2b8;letter-spacing:2.5px;margin-top:2px;}
+    .ph-meta{margin-left:auto;text-align:right;font-size:10.5px;color:#666;}
+    .ph-section-title{font-size:10.5px;font-weight:800;color:#714B67;text-transform:uppercase;letter-spacing:.5px;margin:10px 0 4px;}
+    table{width:100%;border-collapse:collapse;margin-top:6px;}
+    th{background:#f3edf7;color:#5c3d55;text-align:left;padding:6px 8px;font-size:10.8px;border:1px solid #e0d5e5;}
+    td{padding:6px 8px;border:1px solid #eee;font-size:12px;}
+    .ph-info-row{display:flex;justify-content:space-between;font-size:12px;padding:2px 0;}
+    .ph-info-row b{color:#444;}
+    .ph-total-row{font-weight:800;font-size:14.5px;border-top:2px solid #333;padding-top:7px;margin-top:8px;display:flex;justify-content:space-between;color:#714B67;}
+    .ph-badge{display:inline-block;padding:2px 9px;border-radius:10px;font-size:10.5px;font-weight:700;background:#d4edda;color:#155724;}
+    .ph-footer{margin-top:18px;background:#714B67;color:#fff;padding:8px 10px;border-radius:5px;font-size:10px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:5px;}
+    .ph-sig-row{margin-top:34px;display:flex;justify-content:space-between;font-size:11px;}
+    .ph-sig-box{text-align:center;color:#666;}
+    .ph-sig-line{border-top:1px solid #555;width:150px;margin:0 auto 4px;padding-top:4px;}
+    .ph-thanks{text-align:center;margin-top:14px;font-size:12px;color:#714B67;font-weight:700;}
+    @media print{ body{margin:6px auto;} button{display:none;} }
+  </style></head><body>
+    <div class="ph-header">
+      <div class="ph-logo">B</div>
+      <div><div class="ph-name">BAXNAANO</div><div class="ph-sub">HOSPITAL SYSTEM</div></div>
+      <div class="ph-meta">${opts.meta || new Date().toLocaleString()}</div>
+    </div>
+    ${bodyHtml}
+    <div class="ph-footer"><span>📞 +252 613 490 055 / 066</span><span>📍 Zoobe, Kasoo Horjeedka Hayat Market, Mogadishu</span></div>
+  </body></html>`;
+}
+
 /* ---------- doctors / departments / charges ---------- */
 const DOCTORS = {
   'General': ['Dr. Hassan Ali'],
@@ -955,7 +1046,8 @@ async function checkSession(){
 function showMainApp(){
   $('loginScreen').style.display='none';
   $('mainApp').style.display='block';
-  $('userDisp').textContent = '👤 '+APP.user.username+' ('+APP.user.role+')'+(APP.user.doctorName?' — '+APP.user.doctorName:'');
+  $('userDisp').textContent = APP.user.username+' ('+APP.user.role+')'+(APP.user.doctorName?' — '+APP.user.doctorName:'');
+  $('userAvatar').textContent = (APP.user.username||'?').slice(0,2).toUpperCase();
   Nav.build();
   const first = { admin:'dashboard', reception:'appointments', doctor:'doctor', lab:'lab', pharmacy:'pharmacy' }[APP.user.role] || 'dashboard';
   Nav.showView(first);
@@ -1037,6 +1129,53 @@ const Patients = {
 /* ================================================================
    DASHBOARD
 ================================================================ */
+/* ================================================================
+   GLOBAL SEARCH (topbar) — "xog-baar": raadi bukaan meel kasta oo
+   nidaamka ah, hal riix kuguna gee qeybta ku habboon doorkaaga.
+================================================================ */
+const GlobalSearch = {
+  toggle(){
+    const panel = $('globalSearchPanel');
+    const willOpen = panel.style.display==='none';
+    panel.style.display = willOpen ? 'block' : 'none';
+    if(willOpen){ $('globalSearchInput').value=''; $('globalSearchResults').innerHTML=''; $('globalSearchInput').focus(); }
+  },
+  close(){ $('globalSearchPanel').style.display='none'; },
+  search(){
+    const q = ($('globalSearchInput').value||'').toLowerCase().trim();
+    const box = $('globalSearchResults');
+    if(q.length<2){ box.innerHTML=''; return; }
+    const matches = ls_get(K.PATIENTS).filter(p=>`${p.name} ${p.mobile}`.toLowerCase().includes(q)).slice(0,8);
+    if(!matches.length){ box.innerHTML='<p class="text-muted" style="font-size:12px;padding:4px 2px;">Wax lama helin.</p>'; return; }
+    box.innerHTML = matches.map(p=>{
+      const visits = ls_get(K.APPTS).filter(a=>a.patientId===p.id).sort((a,b)=>new Date(b.apptDate)-new Date(a.apptDate));
+      const last = visits[0];
+      return `<div class="gs-result-item" onclick="GlobalSearch.select('${p.id}')">
+        <strong>${sanitize(p.name)}</strong> <span class="text-muted">— ${sanitize(p.mobile||'—')}</span>
+        <div style="font-size:10.6px;color:var(--text-muted);">${visits.length} booqasho${last?' · Ugu dambeysay: '+fmtDate(last.apptDate)+' ('+sanitize(last.doctor||'')+')':''}</div>
+      </div>`;
+    }).join('');
+  },
+  select(patientId){
+    this.close();
+    const role = APP.user.role;
+    const p = ls_get(K.PATIENTS).find(x=>x.id===patientId);
+    if(role==='doctor'){
+      Nav.showView('doctor'); DocUI.showTab('patients'); DocUI.viewPatientHistory(patientId);
+    } else if(role==='pharmacy'){
+      Nav.showView('pharmacy'); PharmUI.showTab('credit');
+      if(p && p.mobile) $('phPaySearch').value = p.mobile;
+    } else if(role==='lab'){
+      Nav.showView('lab'); LabUI.showTab('requests');
+    } else if(role==='admin'){
+      Nav.showView('doctor'); DocUI.showTab('patients'); DocUI.viewPatientHistory(patientId);
+    } else {
+      Nav.showView('appointments');
+      if(p){ $('apptSearch').value = p.name; ApptUI.filter(); }
+    }
+  }
+};
+
 const Dashboard = {
   render(){
     const appts = ls_get(K.APPTS);
@@ -1068,7 +1207,7 @@ const Dashboard = {
     const queue = appts.filter(a=>a.state==='paid' && !a.consulted).sort((a,b)=>(a.queueNum||0)-(b.queueNum||0)).slice(0,8);
     $('dashQueue').innerHTML = queue.length ? queue.map(a=>`
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;font-size:12.6px;">
-        <span><strong style="color:var(--red);">#${a.queueNum}</strong> ${sanitize(a.patientName)} — ${sanitize(a.doctor||'')}</span>
+        <span><strong style="color:var(--red);">${a.queueNum?'#'+a.queueNum:'FU'}</strong> ${sanitize(a.patientName)} — ${sanitize(a.doctor||'')}</span>
         <span class="badge badge-info">${a.department||''}</span>
       </div>`).join('') : '<p class="text-muted">Ma jiro bukaan sugaya.</p>';
 
@@ -1178,13 +1317,16 @@ const ApptUI = {
       // karaan hal meel: diagnosis-ka dhakhtarku qoray, xaalada dawada
       // (Farmashiga), iyo xaalada baaritaanada shaybaarka.
       if(a.consulted){
-        const rx = ls_get(K.RX).find(r=>r.apptId===a.id);
-        const lab = ls_get(K.LABREQ).find(r=>r.apptId===a.id);
+        const rxList = ls_get(K.RX).filter(r=>r.apptId===a.id);
+        const labList = ls_get(K.LABREQ).filter(r=>r.apptId===a.id);
+        const rxDispensed = rxList.length && rxList.every(r=>r.status==='dispensed');
+        const rxPartial = rxList.length && rxList.some(r=>r.status==='dispensed'||r.status==='partially_dispensed') && !rxDispensed;
+        const labCompleted = labList.length && labList.every(r=>r.status==='completed');
         let info = `<b>Xaaladda Booqashada:</b> ${sanitize(a.diagnosis||'Diagnosis lama gelin')}`;
         if(a.history) info += ` <span class="text-muted">(${sanitize(a.history)})</span>`;
         info += '<br>';
-        info += rx ? `Dawo: <span class="badge ${rx.status==='dispensed'?'badge-success':'badge-warning'}">${rx.status==='dispensed'?'La bixiyay Farmashiga':'Sugaya Farmashiga'}</span> &nbsp; ` : '<span class="text-muted">Dawo lama qorin.</span> &nbsp; ';
-        info += lab ? `Lab: <span class="badge ${lab.status==='completed'?'badge-success':'badge-warning'}">${lab.status==='completed'?'Natiijo Dhammaystiran':'Sugaya Shaybaarka'}</span>` : '<span class="text-muted">Baaritaan lab lama codsan.</span>';
+        info += rxList.length ? `Dawo: <span class="badge ${rxDispensed?'badge-success':'badge-warning'}">${rxDispensed?'La bixiyay Farmashiga':(rxPartial?'Qeyb ahaan la bixiyay':'Sugaya Farmashiga')}</span> &nbsp; ` : '<span class="text-muted">Dawo lama qorin.</span> &nbsp; ';
+        info += labList.length ? `Lab: <span class="badge ${labCompleted?'badge-success':'badge-warning'}">${labCompleted?'Natiijo Dhammaystiran':'Sugaya Shaybaarka'}</span>` : '<span class="text-muted">Baaritaan lab lama codsan.</span>';
         $('apptConsultSummary').innerHTML = info;
         $('apptConsultSummary').classList.remove('d-none');
       }
@@ -1294,26 +1436,23 @@ const ApptUI = {
 
   printTicket(id){
     const a = ls_get(K.APPTS).find(x=>x.id===id); if(!a) return;
-    doPrint(`<html><head><title>Ticket ${a.apptNum}</title><style>
-      body{font-family:'Courier New',monospace;max-width:300px;margin:20px auto;font-size:13px;line-height:1.4;}
-      .c{text-align:center;} .b{border-top:2px dashed #333;border-bottom:2px dashed #333;padding:8px 0;margin:8px 0;}
-      </style></head><body>
-      <div class="c"><strong style="font-size:16px;">BAXNAANO HOSPITAL</strong></div>
-      <div class="b c">Taariikh: ${new Date().toLocaleDateString()}</div>
-      <div class="c"><div>NUMBER KA</div><div style="font-size:44px;font-weight:800;color:#c41e3a;">${a.queueNum||0}</div></div>
-      <div class="b">
-        <div><b>Magaca:</b> ${sanitize(a.patientName)}</div>
-        <div><b>Telefoon:</b> ${sanitize(a.mobile||'—')}</div>
-        <div><b>Dhakhtar:</b> ${sanitize(a.doctor||'—')}</div>
-        <div><b>Waaxda:</b> ${sanitize(a.department||'—')}</div>
+    const body = `
+      <div style="text-align:center;margin-bottom:10px;">
+        <div class="ph-section-title" style="margin:0;">Number-ka Safka</div>
+        <div style="font-size:52px;font-weight:900;color:#c41e3a;line-height:1;">${a.queueNum||0}</div>
       </div>
-      <div class="b">
-        <div><b>Qiimaha:</b> ${fmtMoney(a.amount||0)}</div>
-        <div><b>Xaalad:</b> ${a.state==='paid'?'La Bixiyay':'Draft'}</div>
-        <div><b>Cashier:</b> ${sanitize(a.cashier||'—')}</div>
-      </div>
-      <div class="c">Mahadsanid — Baxnaano Hospital</div>
-      </body></html>`);
+      <div class="ph-section-title">Bukaanka</div>
+      <div class="ph-info-row"><span>Magaca</span><b>${sanitize(a.patientName)}</b></div>
+      <div class="ph-info-row"><span>Telefoon</span><b>${sanitize(a.mobile||'—')}</b></div>
+      <div class="ph-info-row"><span>Dhakhtar</span><b>${sanitize(a.doctor||'—')}</b></div>
+      <div class="ph-info-row"><span>Waaxda</span><b>${sanitize(a.department||'—')}</b></div>
+      <div class="ph-section-title">Lacagta</div>
+      <div class="ph-info-row"><span>Qiimaha</span><b>${fmtMoney(a.amount||0)}</b></div>
+      <div class="ph-info-row"><span>Xaalad</span><span class="ph-badge" style="${a.state==='paid'?'':'background:#fff3cd;color:#856404;'}">${a.state==='paid'?'La Bixiyay':'Draft'}</span></div>
+      <div class="ph-info-row"><span>Cashier</span><b>${sanitize(a.cashier||'—')}</b></div>
+      <div class="ph-thanks">Mahadsanid — Baxnaano Hospital</div>
+    `;
+    doPrint(printWrapper('Ticket '+a.apptNum, body, {maxWidth:'320px'}));
   },
 
   openPay(id){
@@ -1445,7 +1584,7 @@ const DocUI = {
     const filtered = appts.filter(a=> !q || `${a.patientName} ${a.mobile}`.toLowerCase().includes(q))
       .sort((a,b)=>(a.queueNum||0)-(b.queueNum||0));
     $('docQueueTbody').innerHTML = filtered.length ? filtered.map(a=>`
-      <tr><td><strong style="color:var(--red);">${a.queueNum}</strong></td><td>${sanitize(a.patientName)}</td>
+      <tr><td><strong style="color:var(--red);">${a.queueNum?a.queueNum:'<span class=\"badge badge-info\">FU</span>'}</strong></td><td>${sanitize(a.patientName)}</td>
         <td>${sanitize(String(a.age||'—'))}</td><td>${a.sex||'—'}</td><td>${a.apptType||'New'}</td><td>${fmtDT(a.apptDate)}</td>
         <td class="actions"><button class="btn btn-primary btn-sm" onclick="DocUI.openPatient('${a.id}')"><i class="bi bi-arrow-right-circle"></i> Bilow</button></td></tr>
     `).join('') : '<tr><td colspan="7" class="text-muted" style="text-align:center;padding:20px;">Bukaan sugaya ma jiro.</td></tr>';
@@ -1461,9 +1600,12 @@ const DocUI = {
     $('medRows').innerHTML=''; $('labTestRows').innerHTML='';
     this.addMedRow(); this.addLabTestRow();
 
-    // previous lab results for THIS visit (from an existing lab request tied to this appt)
-    const req = ls_get(K.LABREQ).find(r=>r.apptId===apptId);
-    const doneTests = req ? req.tests.filter(t=>t.status==='completed') : [];
+    // natiijooyinka lab ee booqashadan — waxaa laga yaabaa dhowr diiwaan
+    // (haddii dhakhtarku dib ugu soo laabtay isla booqashadaas "wax ka
+    // beddel" oo baaritaan dheeraad ah ku daray), sidaas darteed dhammaan
+    // ayaa la isu geynayaa (aggregate), aan lagu koobin midda koowaad.
+    const reqsForAppt = ls_get(K.LABREQ).filter(r=>r.apptId===apptId);
+    const doneTests = reqsForAppt.flatMap(r=>r.tests.filter(t=>t.status==='completed'));
     $('docLabResults').innerHTML = doneTests.length ? doneTests.map(t=>`
       <div style="background:#f0faf6;border:1px solid #a7d7b8;border-radius:4px;padding:8px 10px;margin-bottom:6px;">
         <strong>${sanitize(t.testName)}</strong>
@@ -1585,26 +1727,35 @@ const DocUI = {
     const labAll = ls_get(K.LABREQ).filter(r=>r.patientId===patientId);
 
     let html = `<div class="card" style="background:var(--primary-xlight);border-color:var(--primary-light);">
-      <div class="card-body">
-        <strong style="font-size:1rem;color:var(--primary-dark);">${sanitize(p.name)}</strong>
-        <div style="font-size:12px;color:var(--primary-light);">Da'da: ${p.age||'—'} | Jinsi: ${p.sex||'—'} | Tel: ${sanitize(p.mobile||'—')}</div>
+      <div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+        <div><strong style="font-size:1rem;color:var(--primary-dark);">${sanitize(p.name)}</strong>
+          <div style="font-size:12px;color:var(--primary-light);">Da'da: ${p.age||'—'} | Jinsi: ${p.sex||'—'} | Tel: ${sanitize(p.mobile||'—')}</div></div>
+        <button class="btn btn-success btn-sm" onclick="DocUI.startFollowupVisit('${p.id}')">
+          <i class="bi bi-person-plus-fill"></i> Bilow Booqasho Cusub (Number La'aan)</button>
       </div></div>`;
 
     if(!visits.length){
       html += '<p class="text-muted" style="margin-top:10px;">Bukaankan booqasho hore lama gelin weli.</p>';
     } else {
       html += visits.map(v=>{
-        const rx = rxAll.find(r=>r.apptId===v.id);
-        const lab = labAll.find(r=>r.apptId===v.id);
-        const medsHtml = rx ? rx.medicines.map(m=>`<span class="badge badge-primary" style="margin:2px;">${sanitize(m.name)} ×${m.qty}</span>`).join('') : '';
-        const labHtml = lab ? lab.tests.map(t=>{
+        // Hal booqasho (appointment) wuxuu yeelan karaa dhowr diiwaan oo RX/Lab
+        // ah haddii dhakhtarku dib ugu soo laabtay isla booqashadaas ("wax ka
+        // beddel") oo dawo/baaritaan dheeraad ah ku daray — sidaas darteed
+        // waxaan isu geynaynaa (aggregate) dhammaan diiwaannada la xidhiidha.
+        const rxs = rxAll.filter(r=>r.apptId===v.id);
+        const labs = labAll.filter(r=>r.apptId===v.id);
+        const medsHtml = rxs.flatMap(rx=>rx.medicines).map(m=>`<span class="badge badge-primary" style="margin:2px;">${sanitize(m.name)} ×${m.qty}</span>`).join('');
+        const labHtml = labs.flatMap(lab=>lab.tests).map(t=>{
           const vals = t.results.filter(r=>r.value).map(r=>sanitize(r.name)+'='+sanitize(r.value)).join(', ');
           return `<div style="font-size:11.5px;margin-top:2px;"><b>${sanitize(t.testName)}</b>${vals?': '+vals:' — <span class="text-muted">sugaya</span>'}</div>`;
-        }).join('') : '';
+        }).join('');
         return `<div class="form-section" style="margin-top:10px;">
-          <div style="display:flex;justify-content:space-between;">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;">
             <div class="form-section-title" style="margin-bottom:.3rem;">${fmtDate(v.apptDate)} — ${sanitize(v.doctor||'')}</div>
-            <span class="badge badge-secondary">${sanitize(v.department||'')}</span>
+            <div style="display:flex;gap:5px;align-items:center;">
+              <span class="badge badge-secondary">${sanitize(v.department||v.apptType||'')}</span>
+              <button class="btn btn-outline btn-sm" style="padding:2px 8px;font-size:10.5px;" onclick="DocUI.reopenVisit('${v.id}')"><i class="bi bi-pencil-square"></i> Wax ka beddel</button>
+            </div>
           </div>
           <div style="font-size:12.5px;margin-bottom:4px;"><b>Taariikhda:</b> ${sanitize(v.history||'—')}</div>
           <div style="font-size:12.5px;color:var(--red);font-weight:700;margin-bottom:6px;">${sanitize(v.diagnosis||'Ma jiro diagnosis')}</div>
@@ -1614,6 +1765,37 @@ const DocUI = {
       }).join('');
     }
     $('docPatHistoryBox').innerHTML = html;
+  },
+
+  /* ---- Bilow booqasho cusub oo bukaan hore loo yaqaan, iyada oo aan
+     la sugayn Reception inay ballan/number cusub abuurto — waxay u
+     dhigantaa "follow-up bilaash ah" oo dhakhtarku si toos ah u furi
+     karo. ---- */
+  startFollowupVisit(patientId){
+    const p = ls_get(K.PATIENTS).find(x=>x.id===patientId); if(!p) return;
+    const doctorName = (APP.user.role==='doctor' && APP.user.doctorName) ? APP.user.doctorName : (allDoctorNames()[0]||'');
+    const appts = ls_get(K.APPTS);
+    const newAppt = {
+      id: gid('A'), apptNum: 'FU-'+String(Date.now()).slice(-6), queueNum: 0,
+      patientId: p.id, patientName: p.name, mobile: p.mobile||'', age: p.age||'', sex: p.sex||'',
+      patientType: 'OPD', apptType: 'Follow-up', department: '', doctor: doctorName, chargeType: 'Follow-up (Bilaash)',
+      amount: 0, apptDate: new Date().toISOString(), branch: 'HQ',
+      state: 'paid', paid: 0, discount: 0, paymentMethod: 'Follow-up', consulted: false,
+      cashier: APP.user.username, createdAt: new Date().toISOString(), directVisit: true
+    };
+    appts.unshift(newAppt);
+    ls_set(K.APPTS, appts);
+    this.showTab('queue');
+    this.openPatient(newAppt.id);
+  },
+
+  /* ---- Fur mar kale booqasho hore (xitaa haddii horey loo dhammeeyay) —
+     dhakhtarku wuxuu ku dari karaa fiiro/dawo/baaritaan dheeraad ah,
+     xitaa haddii number-kii hore la isticmaalay. ---- */
+  reopenVisit(apptId){
+    const a = ls_get(K.APPTS).find(x=>x.id===apptId); if(!a) return;
+    this.showTab('queue');
+    this.openPatient(apptId);
   }
 };
 
@@ -1700,22 +1882,19 @@ const LabUI = {
     const r = ls_get(K.LABREQ).find(x=>x.id===reqId); if(!r) return;
     const rows = r.tests.map(t=>t.results.map(res=>`<tr><td>${sanitize(t.testName)}</td><td>${sanitize(res.name)}</td><td><b>${sanitize(res.value||'—')}</b></td><td>${sanitize(res.unit||'')}</td><td>${sanitize(res.range||'—')}</td></tr>`).join('')).join('');
     const tech = (r.tests[0] && r.tests[0].technician) || APP.user.username;
-    doPrint(`<html><head><title>Lab Result</title><style>
-      body{font-family:Arial;max-width:560px;margin:20px auto;font-size:13px;color:#222;}
-      table{width:100%;border-collapse:collapse;margin-top:10px;} td,th{border:1px solid #ccc;padding:6px;font-size:12px;}
-      th{background:#f3edf7;}
-      </style></head><body>
-      <h2 style="color:#714B67;text-align:center;margin-bottom:2px;">BAXNAANO LABORATORY</h2>
-      <p style="text-align:center;color:#666;margin-top:0;">Laboratory Result Report</p>
-      <p><b>Bukaanka:</b> ${sanitize(r.patientName)} &nbsp; <b>Taariikh:</b> ${fmtDate(r.date)}</p>
-      <p><b>Dhakhtarka Codsaday:</b> ${sanitize(r.doctor||'—')}</p>
+    const body = `
+      <div class="ph-section-title">Laboratory Result Report</div>
+      <div class="ph-info-row"><span>Bukaanka</span><b>${sanitize(r.patientName)}</b></div>
+      <div class="ph-info-row"><span>Taariikh</span><b>${fmtDate(r.date)}</b></div>
+      <div class="ph-info-row"><span>Dhakhtarka Codsaday</span><b>${sanitize(r.doctor||'—')}</b></div>
       <table><thead><tr><th>Baaritaan</th><th>Qodob</th><th>Natiijo</th><th>Unit</th><th>Range</th></tr></thead><tbody>${rows}</tbody></table>
-      <p style="margin-top:18px;">Technician: ${sanitize(tech)}</p>
-      <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:12px;">
-        <div style="text-align:center;"><div style="border-top:1px solid #555;width:160px;padding-top:4px;">Signature</div></div>
-        <div style="text-align:center;"><div style="border-top:1px solid #555;width:160px;padding-top:4px;">Stamp</div></div>
+      <div class="ph-info-row" style="margin-top:10px;"><span>Technician</span><b>${sanitize(tech)}</b></div>
+      <div class="ph-sig-row">
+        <div class="ph-sig-box"><div class="ph-sig-line"></div>Signature</div>
+        <div class="ph-sig-box"><div class="ph-sig-line"></div>Stamp</div>
       </div>
-      </body></html>`);
+    `;
+    doPrint(printWrapper('Lab Result — '+r.patientName, body, {maxWidth:'560px'}));
   },
 
   renderPOS(){
@@ -1763,10 +1942,18 @@ const LabUI = {
       customer: $('labCartCustomer').value.trim()||'Walk-in', items:this.cart, subtotal:sub, discount:disc, total, profit,
       paymentMethod:$('labPayMethod').value, cashier:APP.user.username };
     const sales = ls_get(K.LAB_SALES); sales.unshift(sale); ls_set(K.LAB_SALES, sales);
-    doPrint(`<html><head><title>Receipt</title><style>body{font-family:monospace;max-width:300px;margin:20px auto;font-size:12px;}</style></head><body>
-      <h3 style="text-align:center;">🧪 BAXNAANO LAB</h3><p>${new Date(sale.date).toLocaleString()}</p><p>Receipt: ${sale.receiptNo}</p><p>Customer: ${sanitize(sale.customer)}</p>
-      <table style="width:100%;">${sale.items.map(it=>`<tr><td>${it.qty}x ${sanitize(it.name)}</td><td style="text-align:right;">${fmtMoney(it.price*it.qty)}</td></tr>`).join('')}</table>
-      <p style="border-top:1px dashed #333;padding-top:6px;"><b>TOTAL: ${fmtMoney(sale.total)}</b></p></body></html>`);
+    const rows = sale.items.map(it=>`<tr><td>${sanitize(it.name)}</td><td>${it.qty}</td><td>${fmtMoney(it.price)}</td><td>${fmtMoney(it.price*it.qty)}</td></tr>`).join('');
+    const body = `
+      <div class="ph-section-title">Rasiidka Shaybaarka — Receipt ${sale.receiptNo}</div>
+      <div class="ph-info-row"><span>Customer</span><b>${sanitize(sale.customer)}</b></div>
+      <div class="ph-info-row"><span>Cashier</span><b>${sanitize(sale.cashier)}</b></div>
+      <table><thead><tr><th>Alaab</th><th>T</th><th>Qiimo</th><th>Wadar</th></tr></thead><tbody>${rows}</tbody></table>
+      ${sale.discount>0?`<div class="ph-info-row" style="margin-top:6px;"><span>Dhimis</span><b>-${fmtMoney(sale.discount)}</b></div>`:''}
+      <div class="ph-total-row"><span>TOTAL</span><span>${fmtMoney(sale.total)}</span></div>
+      <div class="ph-info-row"><span>Habka Bixinta</span><span class="ph-badge">${sale.paymentMethod}</span></div>
+      <div class="ph-thanks">Mahadsanid — Baxnaano Lab</div>
+    `;
+    doPrint(printWrapper('Receipt '+sale.receiptNo, body));
     Swal.fire({icon:'success', title:'Iibka waa la dhammeeyay', timer:1500, showConfirmButton:false});
     this.clearCart(); this.renderPOS();
   },
@@ -1834,47 +2021,148 @@ const PharmUI = {
   renderRx(){
     const rx = ls_get(K.RX).filter(r=>r.status==='pending');
     $('phRxList').innerHTML = rx.length ? rx.map(r=>{
+      let estTotal = 0;
       const rows = r.medicines.map(m=>{
         const match = this.findProductMatch(m.name);
         const stockInfo = match ? (match.qty>=m.qty ? `<span class="badge badge-success">Diyaar (${match.qty})</span>` : `<span class="badge badge-danger">Stock Yar (${match.qty})</span>`) : `<span class="badge badge-warning">Lama helin alaabta</span>`;
+        if(match) estTotal += match.price * Math.min(m.qty, match.qty);
         return `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #f5f5f5;font-size:12px;">
           <span>${sanitize(m.name)} × ${m.qty} <span class="text-muted">(${sanitize(m.frequency||'')} ${sanitize(m.duration||'')})</span></span>${stockInfo}</div>`;
       }).join('');
       return `<div class="card" style="margin-bottom:10px;"><div class="card-body">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
-          <div><strong>${sanitize(r.patientName)}</strong><div style="font-size:11px;color:var(--text-muted);">Dhakhtar: ${sanitize(r.doctor||'—')} | ${fmtDate(r.date)}</div></div>
-          <button class="btn btn-success btn-sm" onclick="PharmUI.dispense('${r.id}')"><i class="bi bi-check2-circle"></i> Dispense</button>
+          <div><strong>${sanitize(r.patientName)}</strong><div style="font-size:11px;color:var(--text-muted);">Dhakhtar: ${sanitize(r.doctor||'—')} | ${fmtDate(r.date)}</div>
+            <div style="font-size:12.5px;color:var(--primary);font-weight:700;margin-top:2px;">Qiimaha la filayo: ${fmtMoney(estTotal)}</div></div>
+          <button class="btn btn-success btn-sm" onclick="PharmUI.openDispenseModal('${r.id}')"><i class="bi bi-cash-coin"></i> Bixi &amp; Qaad Lacagta</button>
         </div>${rows}</div></div>`;
     }).join('') : '<p class="text-muted">Dawo sugaya ma jiraan.</p>';
   },
-  dispense(rxId){
+
+  /* ---- Dispense = Bixinta dawada + qaadista lacagta (Cash/Credit) hal
+     mar. Farmashigu ma bixiyo alaab bilaash ah — bukaanku waa in uu
+     bixiyaa (ama loo daro deynta), sida POS caadi ah. ---- */
+  dispenseRxId: null,
+
+  openDispenseModal(rxId){
+    const r = ls_get(K.RX).find(x=>x.id===rxId); if(!r) return;
+    this.dispenseRxId = rxId;
+    $('dspRxId').value = rxId;
+    $('dspPatient').textContent = r.patientName;
+    $('dspDoctor').textContent = r.doctor||'—';
+    $('dspPayType').value = 'Cash';
+    const patient = ls_get(K.PATIENTS).find(p=>p.id===r.patientId);
+    $('dspCustName').value = r.patientName;
+    $('dspCustPhone').value = (patient && patient.mobile) || r.phone || '';
+    this.toggleDispenseCredit();
+
+    const rowsHtml = r.medicines.map((m,i)=>{
+      const match = this.findProductMatch(m.name);
+      const avail = match ? match.qty : 0;
+      const price = match ? match.price : 0;
+      const cost = match ? match.cost : 0;
+      const dispenseQty = Math.max(0, Math.min(m.qty, avail));
+      return `<tr data-idx="${i}" data-price="${price}" data-cost="${cost}" data-prodid="${match?match.id:''}">
+        <td>${sanitize(m.name)}<div class="text-muted" style="font-size:10.5px;">${sanitize(m.frequency||'')} · ${sanitize(m.duration||'')}</div></td>
+        <td>${m.qty}</td>
+        <td>${match? avail : '<span style="color:var(--red);">Lama helin</span>'}</td>
+        <td><input type="number" min="0" max="${avail}" value="${dispenseQty}" class="form-control dsp-qty" style="width:78px;padding:4px 6px;" oninput="PharmUI.updateDispenseTotal()" ${match?'':'disabled'}></td>
+        <td>${fmtMoney(price)}</td>
+        <td class="dsp-line-total">${fmtMoney(price*dispenseQty)}</td>
+      </tr>`;
+    }).join('');
+    $('dspTbody').innerHTML = rowsHtml;
+    this.updateDispenseTotal();
+    $('modalDispense').classList.add('open');
+  },
+  closeDispense(){ $('modalDispense').classList.remove('open'); },
+  toggleDispenseCredit(){
+    const isCredit = $('dspPayType').value==='Credit';
+    $('dspCustNameWrap').style.display = isCredit?'':'none';
+    $('dspCustPhoneWrap').style.display = isCredit?'':'none';
+  },
+  updateDispenseTotal(){
+    let total = 0;
+    document.querySelectorAll('#dspTbody tr').forEach(tr=>{
+      const price = parseFloat(tr.dataset.price)||0;
+      const max = parseInt(tr.querySelector('.dsp-qty').max)||0;
+      const qtyInput = tr.querySelector('.dsp-qty');
+      let qty = parseInt(qtyInput.value)||0;
+      if(qty>max){ qty=max; qtyInput.value=max; }
+      if(qty<0){ qty=0; qtyInput.value=0; }
+      const lineTotal = price*qty;
+      tr.querySelector('.dsp-line-total').textContent = fmtMoney(lineTotal);
+      total += lineTotal;
+    });
+    $('dspTotal').textContent = fmtMoney(total);
+  },
+  confirmDispense(){
+    const rxId = $('dspRxId').value;
     const rxList = ls_get(K.RX);
     const r = rxList.find(x=>x.id===rxId); if(!r) return;
+    const payType = $('dspPayType').value;
+    const custName = sanitize($('dspCustName').value,100), custPhone = sanitize($('dspCustPhone').value,20);
+    if(payType==='Credit' && (!custName || !custPhone)){ Swal.fire({icon:'warning', title:'Geli magaca iyo telefoonka macmiilka deynta'}); return; }
+
+    const items = [];
+    document.querySelectorAll('#dspTbody tr').forEach(tr=>{
+      const idx = parseInt(tr.dataset.idx);
+      const qty = parseInt(tr.querySelector('.dsp-qty').value)||0;
+      const price = parseFloat(tr.dataset.price)||0;
+      const cost = parseFloat(tr.dataset.cost)||0;
+      const prodId = tr.dataset.prodid;
+      if(qty>0 && prodId) items.push({idx, id:prodId, name:r.medicines[idx].name, qty, price, cost});
+    });
+    if(!items.length){ Swal.fire({icon:'warning', title:'Fadlan geli tirada dawada la siinayo ugu yaraan hal shay'}); return; }
+
     const products = ls_get(K.PHARM_PROD);
-    let shortages = [];
-    r.medicines.forEach(m=>{
-      const match = this.findProductMatch(m.name);
-      if(!match || match.qty < m.qty) shortages.push(m.name);
-    });
-    if(shortages.length){
-      Swal.fire({icon:'warning', title:'Stock ma filna', html:'Alaabta soo socota lama helin ama way yartahay:<br>'+shortages.join(', ')+'<br><br>Waxaad weli dispense-i kartaa (stock negative ma noqon doonto).'});
+    for(const it of items){
+      const p = products.find(x=>x.id===it.id);
+      if(!p || p.qty<it.qty){ Swal.fire({icon:'error', title:'Stock ma filna: '+it.name}); return; }
     }
-    r.medicines.forEach(m=>{
-      const match = this.findProductMatch(m.name);
-      if(match) match.qty = Math.max(0, match.qty - m.qty);
-    });
+    items.forEach(it=>{ const p=products.find(x=>x.id===it.id); p.qty -= it.qty; });
     ls_set(K.PHARM_PROD, products);
-    r.status='dispensed'; r.dispensedAt=new Date().toISOString(); r.dispensedBy=APP.user.username;
+
+    const total = items.reduce((s,it)=>s+it.price*it.qty,0);
+    const profit = total - items.reduce((s,it)=>s+it.cost*it.qty,0);
+    const sale = { id:gid('PS'), date:new Date().toISOString(), total, profit, payment:payType, user:APP.user.username,
+      rxId:r.id, patientName:r.patientName, doctor:r.doctor,
+      items: items.map(it=>({id:it.id,name:it.name,qty:it.qty,price:it.price,cost:it.cost})) };
+    if(payType==='Credit'){
+      sale.customer=custName; sale.phone=custPhone;
+      const credit = ls_get(K.PHARM_CREDIT);
+      let acc = credit.find(c=>normPhone(c.phone)===normPhone(custPhone));
+      if(!acc){ acc={id:gid('CR'), name:custName, phone:custPhone, balance:0}; credit.push(acc); }
+      acc.balance += total; ls_set(K.PHARM_CREDIT, credit);
+    }
+    const sales = ls_get(K.PHARM_SALES); sales.push(sale); ls_set(K.PHARM_SALES, sales);
+
+    const fullyGiven = r.medicines.every((m,idx)=>{
+      const it = items.find(x=>x.idx===idx);
+      return it && it.qty >= m.qty;
+    });
+    r.status = fullyGiven ? 'dispensed' : 'partially_dispensed';
+    r.dispensedAt = new Date().toISOString(); r.dispensedBy = APP.user.username; r.saleId = sale.id;
     ls_set(K.RX, rxList);
-    doPrint(`<html><head><title>Prescription</title><style>body{font-family:Arial;max-width:500px;margin:20px auto;font-size:13px;}
-      table{width:100%;border-collapse:collapse;margin-top:10px;} td,th{border:1px solid #ccc;padding:6px;}</style></head><body>
-      <h2 style="color:#714B67;text-align:center;">BAXNAANO PHARMACY</h2>
-      <p><b>Bukaanka:</b> ${sanitize(r.patientName)} &nbsp; <b>Dhakhtar:</b> ${sanitize(r.doctor||'')} &nbsp; <b>Taariikh:</b> ${fmtDate(r.date)}</p>
-      <table><tr><th>Dawo</th><th>Qty</th><th>Habka</th></tr>
-      ${r.medicines.map(m=>`<tr><td>${sanitize(m.name)}</td><td>${m.qty}</td><td>${sanitize(m.frequency||'')} — ${sanitize(m.duration||'')}</td></tr>`).join('')}
-      </table><p style="margin-top:20px;">Dispensed by: ${APP.user.username}</p></body></html>`);
-    this.renderRx();
-    Swal.fire({icon:'success', title:'Dawada waa la dispense-gareeyay', timer:1500, showConfirmButton:false});
+
+    this.printDispenseReceipt(sale, r);
+    this.closeDispense();
+    Swal.fire({icon:'success', title: fullyGiven?'Dawada waa la bixiyay, lacagtuna waa la qaatay':'Dawo qeyb ah ayaa la bixiyay', timer:2000, showConfirmButton:false});
+    this.renderRx(); Dashboard.render();
+  },
+  printDispenseReceipt(sale, rx){
+    const rows = sale.items.map(it=>`<tr><td>${sanitize(it.name)}</td><td>${it.qty}</td><td>${fmtMoney(it.price)}</td><td>${fmtMoney(it.price*it.qty)}</td></tr>`).join('');
+    const body = `
+      <div class="ph-section-title">Rasiidka Dawada — Farmashiga</div>
+      <div class="ph-info-row"><span>Bukaanka</span><b>${sanitize(sale.patientName)}</b></div>
+      <div class="ph-info-row"><span>Dhakhtarka Qoray</span><b>${sanitize(sale.doctor||'—')}</b></div>
+      ${sale.customer?`<div class="ph-info-row"><span>Macmiil (Deyn)</span><b>${sanitize(sale.customer)} — ${sanitize(sale.phone||'')}</b></div>`:''}
+      <table><thead><tr><th>Dawo</th><th>T</th><th>Qiimo</th><th>Wadar</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="ph-total-row"><span>TOTAL</span><span>${fmtMoney(sale.total)}</span></div>
+      <div class="ph-info-row"><span>Habka Bixinta</span><span class="ph-badge" style="${sale.payment==='Credit'?'background:#fff3cd;color:#856404;':''}">${sale.payment==='Credit'?'Deyn (Credit)':'Cash'}</span></div>
+      <div class="ph-info-row"><span>Bixiyay</span><b>${sanitize(sale.user)}</b></div>
+      <div class="ph-thanks">Mahadsanid — Baxnaano Pharmacy</div>
+    `;
+    doPrint(printWrapper('Dawo — '+sale.patientName, body));
   },
 
   renderPOS(){
@@ -1929,11 +2217,17 @@ const PharmUI = {
       acc.balance += total; ls_set(K.PHARM_CREDIT, credit);
     }
     const sales = ls_get(K.PHARM_SALES); sales.push(sale); ls_set(K.PHARM_SALES, sales);
-    doPrint(`<html><head><title>Receipt</title><style>body{font-family:monospace;max-width:300px;margin:20px auto;font-size:12px;}</style></head><body>
-      <h3 style="text-align:center;">BAXNAANO PHARMACY</h3><p>${new Date(sale.date).toLocaleString()}</p>
-      ${sale.customer?`<p>Macmiil: ${sanitize(sale.customer)}</p>`:''}
-      <table style="width:100%;">${sale.items.map(it=>`<tr><td>${it.qty}x ${sanitize(it.name)}</td><td style="text-align:right;">${fmtMoney(it.price*it.qty)}</td></tr>`).join('')}</table>
-      <p style="border-top:1px dashed #333;padding-top:6px;"><b>TOTAL: ${fmtMoney(sale.total)}</b></p><p>Habka: ${sale.payment}</p></body></html>`);
+    const rows = sale.items.map(it=>`<tr><td>${sanitize(it.name)}</td><td>${it.qty}</td><td>${fmtMoney(it.price)}</td><td>${fmtMoney(it.price*it.qty)}</td></tr>`).join('');
+    const body = `
+      <div class="ph-section-title">Rasiidka Farmashiga — POS</div>
+      ${sale.customer?`<div class="ph-info-row"><span>Macmiil</span><b>${sanitize(sale.customer)}</b></div>`:''}
+      <div class="ph-info-row"><span>Cashier</span><b>${sanitize(sale.user)}</b></div>
+      <table><thead><tr><th>Dawo</th><th>T</th><th>Qiimo</th><th>Wadar</th></tr></thead><tbody>${rows}</tbody></table>
+      <div class="ph-total-row"><span>TOTAL</span><span>${fmtMoney(sale.total)}</span></div>
+      <div class="ph-info-row"><span>Habka Bixinta</span><span class="ph-badge" style="${sale.payment==='Credit'?'background:#fff3cd;color:#856404;':''}">${sale.payment==='Credit'?'Deyn (Credit)':'Cash'}</span></div>
+      <div class="ph-thanks">Mahadsanid — Baxnaano Pharmacy</div>
+    `;
+    doPrint(printWrapper('Receipt', body));
     Swal.fire({icon:'success', title:'Iibka waa la dhammeeyay', timer:1500, showConfirmButton:false});
     this.cart=[]; $('phCustName').value=''; $('phCustPhone').value=''; $('phPayType').value='Paid'; this.toggleCreditFields();
     this.renderCart(); this.renderPOS();
@@ -2140,6 +2434,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('loginBtn').addEventListener('click', login);
   $('loginPass').addEventListener('keypress', e=>{ if(e.key==='Enter') login(); });
   $('logoutBtn').addEventListener('click', logout);
+  $('btnGlobalSearch').addEventListener('click', ()=>GlobalSearch.toggle());
+  $('globalSearchInput').addEventListener('input', debounce(()=>GlobalSearch.search(),200));
+  document.addEventListener('click', e=>{ if(!e.target.closest('.topbar-search-wrap')) GlobalSearch.close(); });
 
   // Appointments
   $('btnNewAppt').addEventListener('click', ()=>ApptUI.open(null));
@@ -2180,6 +2477,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('phPosSearch').addEventListener('input', debounce(()=>PharmUI.renderPOS(),250));
   $('phPayType').addEventListener('change', ()=>PharmUI.toggleCreditFields());
   $('phCheckout').addEventListener('click', ()=>PharmUI.checkout());
+  $('btnConfirmDispense').addEventListener('click', ()=>PharmUI.confirmDispense());
   $('phProdForm').addEventListener('submit', e=>PharmUI.saveProd(e));
   $('phPayBtn').addEventListener('click', ()=>PharmUI.payCredit());
 
