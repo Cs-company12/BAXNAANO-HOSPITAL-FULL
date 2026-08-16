@@ -6,6 +6,7 @@
 <title>Baxnaano Hospital Management System</title>
 <link rel="icon" type="image/png" href="https://github.com/Cs-company12/DOCTOR-PANAL/raw/main/11.png">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 <script>
   // Fallback in case SweetAlert2 CDN fails to load (keeps the app usable offline)
@@ -320,6 +321,12 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
   <!-- ===================== DOCTOR PANEL ===================== -->
   <div id="view-doctor" class="view">
     <div class="page-wrap">
+      <div class="subnav" style="background:transparent;border:none;padding:0;margin-bottom:.75rem;">
+        <button class="subnav-btn active" data-doc="queue" onclick="DocUI.showTab('queue')">Safka (Queue)</button>
+        <button class="subnav-btn" data-doc="patients" onclick="DocUI.showTab('patients')">Bukaanada — Taariikhda</button>
+      </div>
+
+      <div id="doc-tab-queue" class="subview active">
       <div id="doc-step1" class="card">
         <div class="card-header"><span class="card-title"><i class="bi bi-people-fill"></i> Safka Bukaannada (Queue)</span></div>
         <div class="card-body">
@@ -362,6 +369,19 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
               <div id="docLabResults"><p class="text-muted" style="font-size:12px;">Wax natiijo ah lama helin.</p></div></div>
             <div class="form-section"><div class="form-section-title">Booqashooyinkii Hore</div>
               <div id="docPrevVisits" style="max-height:340px;overflow-y:auto;"></div></div>
+          </div>
+        </div>
+      </div>
+      </div><!-- /doc-tab-queue -->
+
+      <div id="doc-tab-patients" class="subview">
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="bi bi-clock-history"></i> Bukaanada — Taariikhda Buuxa</span></div>
+          <div class="card-body">
+            <div class="toolbar"><div class="search-wrap" style="max-width:none;"><i class="bi bi-search"></i>
+              <input id="docPatSearch" placeholder="Raadi bukaan (magac ama telefoon)..."></div></div>
+            <div id="docPatResults" class="form-grid" style="margin-bottom:1rem;"></div>
+            <div id="docPatHistoryBox"></div>
           </div>
         </div>
       </div>
@@ -514,7 +534,7 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
       <div id="ph-tab-sales" class="subview">
         <div class="card"><div class="card-header"><span class="card-title"><i class="bi bi-receipt"></i> Taariikhda Iibka</span></div>
           <div class="card-body"><div class="tbl-wrap"><table class="dtable">
-            <thead><tr><th>Invoice#</th><th>Taariikh</th><th>Nooca</th><th>Wadarta</th><th>Shaqaale</th></tr></thead>
+            <thead><tr><th>Invoice#</th><th>Taariikh</th><th>Nooca</th><th>Wadarta</th><th>Faa'iido</th><th>Shaqaale</th></tr></thead>
             <tbody id="phSalesTbody"></tbody></table></div></div>
         </div>
       </div>
@@ -554,17 +574,48 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
   <!-- ===================== REPORTS (ADMIN) ===================== -->
   <div id="view-reports" class="view">
     <div class="page-wrap">
-      <div class="toolbar">
-        <label style="font-size:12.6px;font-weight:700;">Taariikh:</label>
-        <input type="date" id="repFrom" class="form-control" style="width:150px;">
-        <input type="date" id="repTo" class="form-control" style="width:150px;">
-        <button class="btn btn-primary btn-sm" id="repLoadBtn">Load</button>
+      <div class="subnav" style="background:transparent;border:none;padding:0;margin-bottom:.75rem;">
+        <button class="subnav-btn active" data-rep="overview" onclick="ReportsUI.showTab('overview')">Warbixin Guud</button>
+        <button class="subnav-btn" data-rep="expenses" onclick="ReportsUI.showTab('expenses')">Kharashaadka Isbitalka</button>
       </div>
-      <div class="stats-row" id="repStats"></div>
-      <div class="form-grid-3">
-        <div class="card"><div class="card-header"><span class="card-title">Cashier/Appointments</span></div><div class="card-body" id="repApptTbl"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title">Lab</span></div><div class="card-body" id="repLabTbl"></div></div>
-        <div class="card"><div class="card-header"><span class="card-title">Pharmacy</span></div><div class="card-body" id="repPharmTbl"></div></div>
+
+      <div id="rep-tab-overview" class="subview active">
+        <div class="toolbar">
+          <label style="font-size:12.6px;font-weight:700;">Taariikh:</label>
+          <input type="date" id="repFrom" class="form-control" style="width:150px;">
+          <input type="date" id="repTo" class="form-control" style="width:150px;">
+          <button class="btn btn-primary btn-sm" id="repLoadBtn">Load</button>
+        </div>
+        <div class="stats-row" id="repStats"></div>
+        <div class="stats-row" id="repProfitStats"></div>
+        <div class="form-grid-3">
+          <div class="card"><div class="card-header"><span class="card-title">Cashier/Appointments</span></div><div class="card-body" id="repApptTbl"></div></div>
+          <div class="card"><div class="card-header"><span class="card-title">Lab</span></div><div class="card-body" id="repLabTbl"></div></div>
+          <div class="card"><div class="card-header"><span class="card-title">Pharmacy</span></div><div class="card-body" id="repPharmTbl"></div></div>
+        </div>
+      </div>
+
+      <div id="rep-tab-expenses" class="subview">
+        <div class="card">
+          <div class="card-header"><span class="card-title"><i class="bi bi-wallet2"></i> Diiwaan Geli Kharash</span></div>
+          <div class="card-body">
+            <form id="expForm" class="form-grid">
+              <div class="form-group"><label>Taariikh</label><input id="expDate" type="date" class="form-control" required></div>
+              <div class="form-group"><label>Nooca</label>
+                <select id="expCategory" class="form-select">
+                  <option>Mushahar (Salary)</option><option>Kirada (Rent)</option><option>Koronto/Biyo (Utilities)</option>
+                  <option>Alaabta Kalkaalinta (Supplies)</option><option>Dayactirka (Maintenance)</option><option>Kale (Other)</option>
+                </select></div>
+              <div class="form-group"><label>Lacagta ($)</label><input id="expAmount" type="number" min="0.01" step="0.01" class="form-control" required></div>
+              <div class="form-group"><label>Faahfaahin</label><input id="expNote" class="form-control" placeholder="Ogeysiis (ikhtiyaari)"></div>
+              <div class="form-group" style="align-self:flex-end;"><button class="btn btn-primary" type="submit">Keydi Kharashka</button></div>
+            </form>
+            <div class="tbl-wrap"><table class="dtable">
+              <thead><tr><th>Taariikh</th><th>Nooca</th><th>Lacagta</th><th>Faahfaahin</th><th>Geliyay</th><th class="actions">Ficil</th></tr></thead>
+              <tbody id="expTbody"></tbody>
+            </table></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -648,17 +699,22 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
 </div>
 
 <div id="modalLabResult" class="modal-overlay">
-  <div class="modal-box">
-    <div class="modal-header"><h3><i class="bi bi-clipboard2-pulse"></i> Geli Natiijada Shaybaarka</h3><button class="modal-close" onclick="LabUI.closeResultModal()">&times;</button></div>
+  <div class="modal-box wide">
+    <div class="modal-header"><h3><i class="bi bi-clipboard2-pulse"></i> Geli Natiijooyinka Shaybaarka</h3><button class="modal-close" onclick="LabUI.closeResultModal()">&times;</button></div>
     <div class="modal-body">
-      <div class="payment-info"><div class="pi-row"><span>Bukaanka</span><span id="lrPatientDisp">--</span></div><div class="pi-row"><span>Test</span><span id="lrTestDisp">--</span></div></div>
-      <input type="hidden" id="lrReqId"><input type="hidden" id="lrTestIdx">
-      <div class="form-group" style="margin-top:.6rem;"><label>Natiijada</label><input id="lrResult" class="form-control" placeholder="Tusaale: Normal, Positive, 120mg/dL"></div>
-      <div class="form-group" style="margin-top:.6rem;"><label>Fiiro gaar ah</label><textarea id="lrNotes" class="form-control" rows="2"></textarea></div>
-      <div class="form-group" style="margin-top:.6rem;"><label>Technician</label><input id="lrTech" class="form-control"></div>
+      <div class="payment-info"><div class="pi-row"><span>Bukaanka</span><span id="lrPatientDisp">--</span></div><div class="pi-row"><span>Dhakhtar</span><span id="lrDoctorDisp">--</span></div></div>
+      <input type="hidden" id="lrReqId">
+      <div class="tbl-wrap" style="margin-top:.7rem;"><table class="dtable" id="lrResultTable">
+        <thead><tr><th style="width:32%;">Qodobka</th><th style="width:26%;">Natiijada</th><th style="width:18%;">Unit</th><th style="width:24%;">Xadka Caadiga</th></tr></thead>
+        <tbody id="lrResultTbody"></tbody>
+      </table></div>
+      <div class="form-grid-2" style="margin-top:.8rem;">
+        <div class="form-group"><label>Technician</label><input id="lrTech" class="form-control"></div>
+        <div class="form-group"><label>Fiiro gaar ah (guud)</label><input id="lrNotes" class="form-control"></div>
+      </div>
     </div>
     <div class="modal-footer"><button class="btn btn-light" onclick="LabUI.closeResultModal()">Jooji</button>
-      <button class="btn btn-success" id="btnSaveLabResult"><i class="bi bi-save"></i> Keydi</button></div>
+      <button class="btn btn-success" id="btnSaveLabResult"><i class="bi bi-save"></i> Keydi Dhammaan Natiijooyinka</button></div>
   </div>
 </div>
 
@@ -678,12 +734,74 @@ const K = {
   USERS:'bax_users', SESSION:'bax_session', PATIENTS:'bax_patients', APPTS:'bax_appointments',
   FOLLOWUPS:'bax_followups', RX:'bax_prescriptions', LABREQ:'bax_lab_requests',
   PHARM_PROD:'bax_pharmacy_products', PHARM_SALES:'bax_pharmacy_sales', PHARM_CREDIT:'bax_pharmacy_credit',
-  LAB_PROD:'bax_lab_products', LAB_SALES:'bax_lab_sales'
+  LAB_PROD:'bax_lab_products', LAB_SALES:'bax_lab_sales', EXPENSES:'bax_expenses'
 };
+
+/* ================================================================
+   SUPABASE MULTI-DEVICE SYNC (optional)
+   1) Samee project ku cusub Supabase.com
+   2) Ku dar SQL-ka la kuu siiyay (supabase_setup.sql) SQL Editor-ka
+   3) Ku beddel SUPABASE_URL iyo SUPABASE_ANON_KEY halkan hoose (ka soo qaad
+      Project Settings -> API ee Supabase dashboard-kaaga)
+   Haddii aadan buuxin, nidaamku wuxuu u shaqeynayaa sidii hore — local-only,
+   hal device (browser-kan kaliya ayaa xogta ku hayn doona).
+================================================================ */
+const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
+const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY';
+const DB = {
+  enabled:false, client:null, table:'bax_app_data',
+  async init(){
+    if(typeof supabase === 'undefined'){ console.warn('Supabase library ma soo shubmin (offline?) — local-only mode.'); return; }
+    if(!SUPABASE_URL || SUPABASE_URL.includes('YOUR_PROJECT') || !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('YOUR_ANON')){
+      console.warn('Supabase lama habeynin — nidaamku wuxuu ku shaqeynayaa local-only mode.'); return;
+    }
+    try{
+      this.client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data, error } = await this.client.from(this.table).select('*');
+      if(error){ console.warn('Supabase load failed', error); return; }
+      (data||[]).forEach(row=>{ if(row && row.key !== undefined) localStorage.setItem(row.key, JSON.stringify(row.value)); });
+      this.enabled = true;
+      this.subscribe();
+      console.info('Supabase sync enabled — '+(data?data.length:0)+' keys loaded.');
+    }catch(err){ console.warn('Supabase init error', err); }
+  },
+  subscribe(){
+    if(!this.client) return;
+    try{
+      this.client.channel('bax_sync_channel')
+        .on('postgres_changes', {event:'*', schema:'public', table:this.table}, payload=>{
+          const row = (payload.new && Object.keys(payload.new).length) ? payload.new : payload.old;
+          if(!row || row.key===undefined) return;
+          localStorage.setItem(row.key, JSON.stringify(row.value));
+          onRemoteDataChange(row.key);
+        })
+        .subscribe();
+    }catch(err){ console.warn('Supabase subscribe error', err); }
+  },
+  async persist(key, data){
+    if(!this.enabled || !this.client) return;
+    try{
+      await this.client.from(this.table).upsert({key, value:data, updated_at:new Date().toISOString()}, {onConflict:'key'});
+    }catch(err){ console.warn('Supabase persist failed', key, err); }
+  }
+};
+function getActiveViewId(){ const el=document.querySelector('.view.active'); return el?el.id.replace('view-',''):null; }
+function onRemoteDataChange(key){
+  // Ha carqaladeynin foom furan (modal) — si aan loo lumin wixii la geliyay
+  if(document.querySelector('.modal-overlay.open')) return;
+  const v = getActiveViewId();
+  if(v) Nav.showView(v);
+}
 
 /* ---------- storage ---------- */
 function ls_get(k, def){ if(def===undefined) def=[]; try{ const d=localStorage.getItem(k); return d===null?def:JSON.parse(d); }catch(e){ return def; } }
-function ls_set(k, data){ try{ localStorage.setItem(k, JSON.stringify(data)); return true; }catch(e){ console.error('storage failed',k,e); return false; } }
+function ls_set(k, data){
+  try{
+    localStorage.setItem(k, JSON.stringify(data));
+    if(typeof DB!=='undefined' && DB.enabled) DB.persist(k, data);
+    return true;
+  }catch(e){ console.error('storage failed',k,e); return false; }
+}
 function gid(prefix){ return prefix+'_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); }
 function fmtMoney(n){ return '$'+(parseFloat(n)||0).toFixed(2); }
 function fmtDate(d){ try{ return new Date(d).toLocaleDateString(); }catch(e){ return d||''; } }
@@ -728,7 +846,41 @@ function chargesForDoctor(doc){ return DOCTOR_CHARGES[doc] || DOCTOR_CHARGES._de
 function allDoctorNames(){ const set=new Set(); Object.values(DOCTORS).forEach(list=>list.forEach(d=>set.add(d))); return [...set]; }
 
 /* ---------- default lab tests / medicines ---------- */
-const DEFAULT_LAB_TESTS = ['CBC','Blood Sugar','Urine Test','Stool Test','Malaria','Widal (Typhoid)','H. Pylori','HBsAg','Pregnancy Test (HCG)','Lipid Profile','Liver Function','Kidney Function','X-Ray','Ultrasound'];
+const DEFAULT_LAB_TESTS = ['Blood Sugar (Random)','Blood Sugar (Fasting)','Malaria','Widal (Typhoid)','H. Pylori','HBsAg','HCV','HIV Screening','Pregnancy Test (HCG)','ESR','X-Ray','Ultrasound'];
+/* Panel-ka baaritaannada leh dhowr qodob (natiijadu waxay noqonaysaa table
+   la wax ka beddeli karo — qodob kasta oo unit + xad caadi ah leh). */
+const TEST_TEMPLATES = {
+  'CBC': [
+    {name:'White Blood Cells (WBC)',unit:'x10^9/L',range:'4.0-11.0'}, {name:'Red Blood Cells (RBC)',unit:'x10^12/L',range:'4.5-5.9'},
+    {name:'Hemoglobin',unit:'g/dL',range:'13.5-17.5'}, {name:'Hematocrit',unit:'%',range:'41-53'},
+    {name:'Platelets',unit:'x10^9/L',range:'150-450'}, {name:'MCV',unit:'fL',range:'80-100'},
+    {name:'MCH',unit:'pg',range:'27-31'}, {name:'MCHC',unit:'g/dL',range:'33-36'}
+  ],
+  'Urine Test': [
+    {name:'Color',unit:'',range:'Yellow'}, {name:'Appearance',unit:'',range:'Clear'}, {name:'pH',unit:'',range:'4.5-8.0'},
+    {name:'Specific Gravity',unit:'',range:'1.005-1.030'}, {name:'Protein',unit:'mg/dL',range:'Negative'},
+    {name:'Glucose',unit:'mg/dL',range:'Negative'}, {name:'Ketones',unit:'mg/dL',range:'Negative'}, {name:'Leukocyte Esterase',unit:'',range:'Negative'}
+  ],
+  'Stool Test': [
+    {name:'Color',unit:'',range:'Brown'}, {name:'Consistency',unit:'',range:'Formed'},
+    {name:'Occult Blood',unit:'',range:'Negative'}, {name:'Ova/Parasites',unit:'',range:'Negative'}, {name:'Mucus',unit:'',range:'Negative'}
+  ],
+  'Lipid Profile': [
+    {name:'Total Cholesterol',unit:'mg/dL',range:'<200'}, {name:'HDL Cholesterol',unit:'mg/dL',range:'>=40'},
+    {name:'LDL Cholesterol',unit:'mg/dL',range:'<100'}, {name:'Triglycerides',unit:'mg/dL',range:'<150'}
+  ],
+  'Blood Chemistry': [
+    {name:'Glucose (Fasting)',unit:'mg/dL',range:'70-100'}, {name:'Urea',unit:'mg/dL',range:'7-20'},
+    {name:'Creatinine',unit:'mg/dL',range:'0.6-1.3'}, {name:'ALT',unit:'U/L',range:'7-56'}, {name:'AST',unit:'U/L',range:'10-40'}
+  ],
+  'Liver Function': [
+    {name:'ALT (SGPT)',unit:'U/L',range:'7-56'}, {name:'AST (SGOT)',unit:'U/L',range:'10-40'},
+    {name:'Total Bilirubin',unit:'mg/dL',range:'0.1-1.2'}, {name:'Albumin',unit:'g/dL',range:'3.5-5.0'}
+  ],
+  'Kidney Function': [
+    {name:'Urea',unit:'mg/dL',range:'7-20'}, {name:'Creatinine',unit:'mg/dL',range:'0.6-1.3'}, {name:'Uric Acid',unit:'mg/dL',range:'3.5-7.2'}
+  ]
+};
 
 /* ---------- CURRENT SESSION ---------- */
 const APP = { user:null };
@@ -897,9 +1049,15 @@ const Dashboard = {
     const lowStock = phProducts.filter(p=>p.qty<=p.low).length;
     const expiring = phProducts.filter(p=>isExpired(p.expiry)||isExpiringSoon(p.expiry)).length;
 
+    const labProfitToday = ls_get(K.LAB_SALES).filter(s=>(s.date||'').startsWith(today)).reduce((s,x)=>s+(x.profit||0),0);
+    const phProfitToday = ls_get(K.PHARM_SALES).filter(s=>(s.date||'').startsWith(today)).reduce((s,x)=>s+(x.profit||0),0);
+    const expToday = ls_get(K.EXPENSES).filter(e=>e.date===today).reduce((s,e)=>s+(e.amount||0),0);
+    const netProfitToday = revToday + labProfitToday + phProfitToday - expToday;
+
     $('dashStats').innerHTML = `
       <div class="stat-box"><small>Ballamaha Maanta</small><div class="val">${todayAppts.length}</div></div>
       <div class="stat-box"><small>Dakhliga Maanta</small><div class="val green">${fmtMoney(revToday)}</div></div>
+      <div class="stat-box"><small>Faa'iidada Maanta (Net)</small><div class="val" style="color:${netProfitToday>=0?'var(--green)':'var(--red)'};">${fmtMoney(netProfitToday)}</div></div>
       <div class="stat-box"><small>Sugaya Dhakhtarka</small><div class="val orange">${queueWaiting}</div></div>
       <div class="stat-box"><small>Dawo Sugaya (Rx)</small><div class="val orange">${rxPending}</div></div>
       <div class="stat-box"><small>Lab Sugaya</small><div class="val orange">${labPending}</div></div>
@@ -1251,7 +1409,16 @@ const DocUI = {
   },
 
   render(){
-    this.showQueue();
+    this.showTab('queue');
+  },
+
+  showTab(tab){
+    document.querySelectorAll('#view-doctor .subview').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('#view-doctor .subnav-btn').forEach(b=>b.classList.remove('active'));
+    $('doc-tab-'+tab).classList.add('active');
+    document.querySelector(`#view-doctor .subnav-btn[data-doc="${tab}"]`).classList.add('active');
+    if(tab==='queue') this.showQueue();
+    if(tab==='patients'){ $('docPatResults').innerHTML=''; $('docPatHistoryBox').innerHTML=''; $('docPatSearch').value=''; }
   },
 
   showQueue(){
@@ -1283,8 +1450,9 @@ const DocUI = {
     const doneTests = req ? req.tests.filter(t=>t.status==='completed') : [];
     $('docLabResults').innerHTML = doneTests.length ? doneTests.map(t=>`
       <div style="background:#f0faf6;border:1px solid #a7d7b8;border-radius:4px;padding:8px 10px;margin-bottom:6px;">
-        <strong>${sanitize(t.testName)}</strong>: ${sanitize(t.result||'—')}
-        ${t.notes?`<div style="font-size:11px;color:var(--text-muted);">${sanitize(t.notes)}</div>`:''}
+        <strong>${sanitize(t.testName)}</strong>
+        <div style="font-size:12px;margin-top:3px;">${t.results.map(res=>sanitize(res.name)+': <b>'+sanitize(res.value||'—')+'</b>'+(res.unit?' '+sanitize(res.unit):'')).join('<br>')}</div>
+        ${t.notes?`<div style="font-size:11px;color:var(--text-muted);margin-top:3px;">${sanitize(t.notes)}</div>`:''}
       </div>`).join('') : '<p class="text-muted" style="font-size:12px;">Wax natiijo ah lama helin.</p>';
 
     // previous visits for this patient
@@ -1320,7 +1488,12 @@ const DocUI = {
     const div = document.createElement('div');
     div.className='lab-test-row';
     div.style.cssText='display:flex;gap:6px;margin-bottom:6px;';
-    div.innerHTML = `<select class="form-select lab-test-name" style="flex:1;">${DEFAULT_LAB_TESTS.map(t=>`<option>${t}</option>`).join('')}</select>
+    const panelOpts = Object.keys(TEST_TEMPLATES).map(t=>`<option value="panel:${t}">${t} — Xirmo (${TEST_TEMPLATES[t].length} qodob)</option>`).join('');
+    const singleOpts = DEFAULT_LAB_TESTS.map(t=>`<option value="single:${t}">${t}</option>`).join('');
+    div.innerHTML = `<select class="form-select lab-test-name" style="flex:1;">
+        <optgroup label="Xirmooyin (Panels — dhowr qodob)">${panelOpts}</optgroup>
+        <optgroup label="Baaritaano Kaligood (hal natiijo)">${singleOpts}</optgroup>
+      </select>
       <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.lab-test-row').remove()"><i class="bi bi-trash"></i></button>`;
     $('labTestRows').appendChild(div);
   },
@@ -1348,18 +1521,81 @@ const DocUI = {
       ls_set(K.RX, rx);
     }
 
-    const tests = Array.from(document.querySelectorAll('.lab-test-row')).map(r=>({
-      testName: r.querySelector('.lab-test-name').value, status:'pending', result:'', notes:'', technician:'', resultDate:''
-    }));
+    const tests = Array.from(document.querySelectorAll('.lab-test-row')).map(r=>{
+      const raw = r.querySelector('.lab-test-name').value; // "panel:CBC" ama "single:Malaria"
+      const sep = raw.indexOf(':');
+      const type = raw.slice(0,sep), name = raw.slice(sep+1);
+      const params = type==='panel' ? TEST_TEMPLATES[name].map(p=>({...p})) : [{name:name, unit:'', range:''}];
+      return { id:gid('T'), testName:name, isPanel:type==='panel', params,
+        results: params.map(p=>({name:p.name, unit:p.unit, range:p.range, value:''})),
+        status:'pending', technician:'', resultDate:'', notes:'' };
+    });
     if(tests.length){
       const reqs = ls_get(K.LABREQ);
       reqs.unshift({ id:gid('LR'), apptId:a.id, patientId:a.patientId, patientName:a.patientName, phone:a.mobile,
-        doctor:a.doctor, date:new Date().toISOString(), tests, status:'pending' });
+        age:a.age||'', sex:a.sex||'', doctor:a.doctor, date:new Date().toISOString(), tests, status:'pending' });
       ls_set(K.LABREQ, reqs);
     }
 
     Swal.fire({icon:'success', title:'Booqashada waa la keydiyay', text: (meds.length?'Dawo ayaa loo diray Farmashiga. ':'')+(tests.length?'Baaritaan ayaa loo diray Shaybaarka.':''), timer:2400, showConfirmButton:false});
     this.showQueue(); Dashboard.render();
+  },
+
+  /* ---- Bukaanada tab: raadi hal bukaan oo aad ka arki karto taariikhdiisa
+     buuxa — booqashooyinkii hore oo dhan, dawooyinkii la qoray, iyo
+     natiijooyinkii shaybaarka — si dhakhtarku ugu baran karo bukaan uu
+     hore ula kulmay iyo mid cusub oo la geliyay. ---- */
+  searchPatients(){
+    const q = ($('docPatSearch').value||'').toLowerCase().trim();
+    const box = $('docPatResults');
+    if(q.length<2){ box.innerHTML=''; return; }
+    const matches = ls_get(K.PATIENTS).filter(p=>`${p.name} ${p.mobile}`.toLowerCase().includes(q)).slice(0,9);
+    box.innerHTML = matches.length ? matches.map(p=>{
+      const visits = ls_get(K.APPTS).filter(a=>a.patientId===p.id).length;
+      return `<div class="card" style="cursor:pointer;margin-bottom:0;" onclick="DocUI.viewPatientHistory('${p.id}')">
+        <div class="card-body" style="padding:.6rem .8rem;">
+          <strong>${sanitize(p.name)}</strong><div style="font-size:11px;color:var(--text-muted);">${sanitize(p.mobile||'—')} · ${p.sex||'—'} · ${p.age||'—'}y</div>
+          <span class="badge badge-primary" style="margin-top:4px;">${visits} booqasho</span>
+        </div></div>`;
+    }).join('') : '<p class="text-muted">Bukaan lama helin.</p>';
+  },
+  viewPatientHistory(patientId){
+    const p = ls_get(K.PATIENTS).find(x=>x.id===patientId); if(!p) return;
+    const visits = ls_get(K.APPTS).filter(a=>a.patientId===patientId && a.consulted)
+      .sort((a,b)=>new Date(b.apptDate)-new Date(a.apptDate));
+    const rxAll = ls_get(K.RX).filter(r=>r.patientId===patientId);
+    const labAll = ls_get(K.LABREQ).filter(r=>r.patientId===patientId);
+
+    let html = `<div class="card" style="background:var(--primary-xlight);border-color:var(--primary-light);">
+      <div class="card-body">
+        <strong style="font-size:1rem;color:var(--primary-dark);">${sanitize(p.name)}</strong>
+        <div style="font-size:12px;color:var(--primary-light);">Da'da: ${p.age||'—'} | Jinsi: ${p.sex||'—'} | Tel: ${sanitize(p.mobile||'—')}</div>
+      </div></div>`;
+
+    if(!visits.length){
+      html += '<p class="text-muted" style="margin-top:10px;">Bukaankan booqasho hore lama gelin weli.</p>';
+    } else {
+      html += visits.map(v=>{
+        const rx = rxAll.find(r=>r.apptId===v.id);
+        const lab = labAll.find(r=>r.apptId===v.id);
+        const medsHtml = rx ? rx.medicines.map(m=>`<span class="badge badge-primary" style="margin:2px;">${sanitize(m.name)} ×${m.qty}</span>`).join('') : '';
+        const labHtml = lab ? lab.tests.map(t=>{
+          const vals = t.results.filter(r=>r.value).map(r=>sanitize(r.name)+'='+sanitize(r.value)).join(', ');
+          return `<div style="font-size:11.5px;margin-top:2px;"><b>${sanitize(t.testName)}</b>${vals?': '+vals:' — <span class="text-muted">sugaya</span>'}</div>`;
+        }).join('') : '';
+        return `<div class="form-section" style="margin-top:10px;">
+          <div style="display:flex;justify-content:space-between;">
+            <div class="form-section-title" style="margin-bottom:.3rem;">${fmtDate(v.apptDate)} — ${sanitize(v.doctor||'')}</div>
+            <span class="badge badge-secondary">${sanitize(v.department||'')}</span>
+          </div>
+          <div style="font-size:12.5px;margin-bottom:4px;"><b>Taariikhda:</b> ${sanitize(v.history||'—')}</div>
+          <div style="font-size:12.5px;color:var(--red);font-weight:700;margin-bottom:6px;">${sanitize(v.diagnosis||'Ma jiro diagnosis')}</div>
+          ${medsHtml?`<div style="margin-bottom:4px;"><b style="font-size:11.5px;">Dawooyin:</b><br>${medsHtml}</div>`:''}
+          ${labHtml?`<div><b style="font-size:11.5px;">Shaybaar:</b>${labHtml}</div>`:''}
+        </div>`;
+      }).join('');
+    }
+    $('docPatHistoryBox').innerHTML = html;
   }
 };
 
@@ -1382,44 +1618,86 @@ const LabUI = {
 
   renderRequests(){
     const reqs = ls_get(K.LABREQ);
-    const pending = [], completed = [];
-    reqs.forEach(r=>{ r.tests.forEach((t,idx)=>{
-      const item = {req:r, test:t, idx};
-      (t.status==='pending' ? pending : completed).push(item);
-    }); });
-    $('labPendingList').innerHTML = pending.length ? pending.map(it=>`
+    const pending = reqs.filter(r=>r.tests.some(t=>t.status==='pending'));
+    const completed = reqs.filter(r=>r.tests.length && r.tests.every(t=>t.status==='completed'));
+
+    $('labPendingList').innerHTML = pending.length ? pending.map(r=>`
       <div style="background:#fff;border-left:4px solid var(--yellow);border:1px solid var(--border);border-radius:4px;padding:10px 12px;margin-bottom:8px;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div><strong>${sanitize(it.req.patientName)}</strong><div style="font-size:11px;color:var(--text-muted);">Dhakhtar: ${sanitize(it.req.doctor||'—')} | ${fmtDate(it.req.date)}</div>
-            <div style="color:var(--orange);font-weight:700;font-size:12.5px;margin-top:3px;"><i class="bi bi-vial"></i> ${sanitize(it.test.testName)}</div></div>
-          <button class="btn btn-warning btn-sm" onclick="LabUI.openResultModal('${it.req.id}',${it.idx})">Geli Natiijo</button>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div><strong>${sanitize(r.patientName)}</strong> <span class="text-muted" style="font-size:11px;">(${r.age||'—'}y, ${r.sex||'—'})</span>
+            <div style="font-size:11px;color:var(--text-muted);">Dhakhtar: ${sanitize(r.doctor||'—')} | Tel: ${sanitize(r.phone||'—')} | ${fmtDate(r.date)}</div>
+            <div style="margin-top:5px;display:flex;gap:5px;flex-wrap:wrap;">${r.tests.map(t=>`<span class="badge ${t.status==='completed'?'badge-success':'badge-warning'}"><i class="bi bi-vial"></i> ${sanitize(t.testName)}${t.isPanel?' ('+t.params.length+' qodob)':''}</span>`).join('')}</div></div>
+          <button class="btn btn-warning btn-sm" onclick="LabUI.openResultModal('${r.id}')"><i class="bi bi-clipboard2-pulse"></i> Geli Natiijooyinka</button>
         </div></div>`).join('') : '<p class="text-muted">Codsi sugaya ma jiro.</p>';
-    $('labCompletedList').innerHTML = completed.length ? completed.slice(0,40).map(it=>`
+
+    $('labCompletedList').innerHTML = completed.length ? completed.slice(0,40).map(r=>`
       <div style="background:#fff;border-left:4px solid var(--green);border:1px solid var(--border);border-radius:4px;padding:10px 12px;margin-bottom:8px;">
-        <strong>${sanitize(it.req.patientName)}</strong>
-        <div style="color:#155724;font-weight:700;font-size:12.5px;">${sanitize(it.test.testName)}: ${sanitize(it.test.result||'—')}</div>
-        <div style="font-size:11px;color:var(--text-muted);">By ${sanitize(it.test.technician||'—')} · ${fmtDate(it.test.resultDate)}</div>
-      </div>`).join('') : '<p class="text-muted">Natiijo lama helin weli.</p>';
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+          <div><strong>${sanitize(r.patientName)}</strong><div style="font-size:11px;color:var(--text-muted);">Dhakhtar: ${sanitize(r.doctor||'—')} | ${fmtDate(r.date)}</div>
+            ${r.tests.map(t=>`<div style="font-size:12px;color:#155724;margin-top:3px;"><b>${sanitize(t.testName)}:</b> ${t.results.map(res=>sanitize(res.name)+'='+sanitize(res.value||'—')).join(', ')}</div>`).join('')}</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <button class="btn btn-secondary btn-sm" onclick="LabUI.printResult('${r.id}')"><i class="bi bi-printer"></i></button>
+            <button class="btn btn-outline btn-sm" onclick="LabUI.openResultModal('${r.id}')"><i class="bi bi-pencil"></i></button>
+          </div>
+        </div></div>`).join('') : '<p class="text-muted">Natiijo lama helin weli.</p>';
   },
-  openResultModal(reqId, idx){
+  openResultModal(reqId){
     const req = ls_get(K.LABREQ).find(r=>r.id===reqId); if(!req) return;
-    $('lrReqId').value=reqId; $('lrTestIdx').value=idx;
-    $('lrPatientDisp').textContent = req.patientName; $('lrTestDisp').textContent = req.tests[idx].testName;
-    $('lrResult').value=''; $('lrNotes').value=''; $('lrTech').value=APP.user.username;
+    $('lrReqId').value = reqId;
+    $('lrPatientDisp').textContent = req.patientName; $('lrDoctorDisp').textContent = req.doctor||'—';
+    $('lrTech').value = (req.tests[0] && req.tests[0].technician) || APP.user.username;
+    $('lrNotes').value = (req.tests[0] && req.tests[0].notes) || '';
+    const rows = [];
+    req.tests.forEach((t,ti)=>{
+      rows.push(`<tr style="background:#f8f0f3;"><td colspan="4"><strong>${sanitize(t.testName)}</strong>${t.status==='completed'?' <span class="badge badge-success">La dhammeeyay</span>':''}</td></tr>`);
+      t.results.forEach((res,ri)=>{
+        rows.push(`<tr><td style="padding-left:1.4rem;">${sanitize(res.name)}</td>
+          <td><input type="text" class="form-control lr-val" data-ti="${ti}" data-ri="${ri}" value="${sanitize(res.value||'')}" style="padding:5px 8px;"></td>
+          <td>${sanitize(res.unit||'—')}</td><td>${sanitize(res.range||'—')}</td></tr>`);
+      });
+    });
+    $('lrResultTbody').innerHTML = rows.join('');
     $('modalLabResult').classList.add('open');
   },
   closeResultModal(){ $('modalLabResult').classList.remove('open'); },
   saveResult(){
-    const reqId=$('lrReqId').value, idx=parseInt($('lrTestIdx').value);
-    const result=$('lrResult').value.trim();
-    if(!result){ Swal.fire({icon:'warning', title:'Geli natiijada'}); return; }
+    const reqId = $('lrReqId').value;
     const reqs = ls_get(K.LABREQ);
     const r = reqs.find(x=>x.id===reqId); if(!r) return;
-    r.tests[idx] = {...r.tests[idx], status:'completed', result, notes:$('lrNotes').value.trim(), technician:$('lrTech').value.trim(), resultDate:new Date().toISOString()};
+    const tech = $('lrTech').value.trim(), notes = $('lrNotes').value.trim();
+    document.querySelectorAll('.lr-val').forEach(inp=>{
+      const ti = parseInt(inp.dataset.ti), ri = parseInt(inp.dataset.ri);
+      r.tests[ti].results[ri].value = inp.value.trim();
+    });
+    r.tests.forEach(t=>{
+      const filled = t.results.some(res=>res.value);
+      if(filled){ t.status='completed'; t.technician=tech; t.notes=notes; t.resultDate=new Date().toISOString(); }
+    });
     r.status = r.tests.every(t=>t.status==='completed') ? 'completed' : 'pending';
     ls_set(K.LABREQ, reqs);
     this.closeResultModal(); this.renderRequests(); Dashboard.render();
-    Swal.fire({icon:'success', title:'Natiijada waa la keydiyay', timer:1200, showConfirmButton:false});
+    Swal.fire({icon:'success', title:'Natiijooyinka waa la keydiyay', timer:1200, showConfirmButton:false});
+  },
+  printResult(reqId){
+    const r = ls_get(K.LABREQ).find(x=>x.id===reqId); if(!r) return;
+    const rows = r.tests.map(t=>t.results.map(res=>`<tr><td>${sanitize(t.testName)}</td><td>${sanitize(res.name)}</td><td><b>${sanitize(res.value||'—')}</b></td><td>${sanitize(res.unit||'')}</td><td>${sanitize(res.range||'—')}</td></tr>`).join('')).join('');
+    const tech = (r.tests[0] && r.tests[0].technician) || APP.user.username;
+    doPrint(`<html><head><title>Lab Result</title><style>
+      body{font-family:Arial;max-width:560px;margin:20px auto;font-size:13px;color:#222;}
+      table{width:100%;border-collapse:collapse;margin-top:10px;} td,th{border:1px solid #ccc;padding:6px;font-size:12px;}
+      th{background:#f3edf7;}
+      </style></head><body>
+      <h2 style="color:#714B67;text-align:center;margin-bottom:2px;">BAXNAANO LABORATORY</h2>
+      <p style="text-align:center;color:#666;margin-top:0;">Laboratory Result Report</p>
+      <p><b>Bukaanka:</b> ${sanitize(r.patientName)} &nbsp; <b>Taariikh:</b> ${fmtDate(r.date)}</p>
+      <p><b>Dhakhtarka Codsaday:</b> ${sanitize(r.doctor||'—')}</p>
+      <table><thead><tr><th>Baaritaan</th><th>Qodob</th><th>Natiijo</th><th>Unit</th><th>Range</th></tr></thead><tbody>${rows}</tbody></table>
+      <p style="margin-top:18px;">Technician: ${sanitize(tech)}</p>
+      <div style="margin-top:40px;display:flex;justify-content:space-between;font-size:12px;">
+        <div style="text-align:center;"><div style="border-top:1px solid #555;width:160px;padding-top:4px;">Signature</div></div>
+        <div style="text-align:center;"><div style="border-top:1px solid #555;width:160px;padding-top:4px;">Stamp</div></div>
+      </div>
+      </body></html>`);
   },
 
   renderPOS(){
@@ -1591,7 +1869,7 @@ const PharmUI = {
   addToCart(pid){
     const p = ls_get(K.PHARM_PROD).find(x=>x.id===pid); if(!p || p.qty<=0) return;
     const ex = this.cart.find(c=>c.id===pid);
-    if(ex){ if(ex.qty<p.qty) ex.qty++; } else this.cart.push({id:p.id, name:p.name, price:p.price, qty:1});
+    if(ex){ if(ex.qty<p.qty) ex.qty++; } else this.cart.push({id:p.id, name:p.name, price:p.price, cost:p.cost||0, qty:1});
     this.renderCart();
   },
   renderCart(){
@@ -1622,8 +1900,9 @@ const PharmUI = {
     this.cart.forEach(c=>{ const p=products.find(x=>x.id===c.id); p.qty -= c.qty; });
     ls_set(K.PHARM_PROD, products);
     const total = this.cart.reduce((s,c)=>s+c.price*c.qty,0);
-    const sale = { id:gid('PS'), date:new Date().toISOString(), total, payment:payType, user:APP.user.username,
-      items:this.cart.map(c=>({id:c.id,name:c.name,qty:c.qty,price:c.price})) };
+    const profit = total - this.cart.reduce((s,c)=>s+(c.cost||0)*c.qty,0);
+    const sale = { id:gid('PS'), date:new Date().toISOString(), total, profit, payment:payType, user:APP.user.username,
+      items:this.cart.map(c=>({id:c.id,name:c.name,qty:c.qty,price:c.price,cost:c.cost||0})) };
     if(payType==='Credit'){
       sale.customer=custName; sale.phone=custPhone;
       const credit = ls_get(K.PHARM_CREDIT);
@@ -1692,7 +1971,7 @@ const PharmUI = {
 
   renderSales(){
     const sales = ls_get(K.PHARM_SALES).slice().reverse();
-    $('phSalesTbody').innerHTML = sales.map(s=>`<tr><td>${s.id.slice(-8)}</td><td>${fmtDT(s.date)}</td><td>${s.payment}</td><td>${fmtMoney(s.total)}</td><td>${sanitize(s.user)}</td></tr>`).join('');
+    $('phSalesTbody').innerHTML = sales.map(s=>`<tr><td>${s.id.slice(-8)}</td><td>${fmtDT(s.date)}</td><td>${s.payment}</td><td>${fmtMoney(s.total)}</td><td style="color:var(--green);">${fmtMoney(s.profit||0)}</td><td>${sanitize(s.user)}</td></tr>`).join('');
   }
 };
 
@@ -1745,10 +2024,18 @@ const UsersUI = {
    REPORTS (ADMIN ONLY) — unified revenue across all modules
 ================================================================ */
 const ReportsUI = {
+  showTab(tab){
+    document.querySelectorAll('#view-reports .subview').forEach(el=>el.classList.remove('active'));
+    document.querySelectorAll('#view-reports .subnav-btn').forEach(b=>b.classList.remove('active'));
+    $('rep-tab-'+tab).classList.add('active');
+    document.querySelector(`#view-reports .subnav-btn[data-rep="${tab}"]`).classList.add('active');
+    if(tab==='overview') this.load();
+    if(tab==='expenses') this.renderExpenses();
+  },
   render(){
     if(!$('repFrom').value){ const d=new Date(); d.setDate(d.getDate()-7); $('repFrom').value=d.toISOString().split('T')[0]; }
     if(!$('repTo').value){ $('repTo').value=todayStr(); }
-    this.load();
+    this.showTab('overview');
   },
   load(){
     const from=$('repFrom').value, to=$('repTo').value;
@@ -1758,23 +2045,68 @@ const ReportsUI = {
     const apptRev = appts.reduce((s,a)=>s+(a.paid||0),0);
 
     const labSales = ls_get(K.LAB_SALES).filter(s=>inRange(s.date));
-    const labRev = labSales.reduce((s,x)=>s+x.total,0), labProfit = labSales.reduce((s,x)=>s+x.profit,0);
+    const labRev = labSales.reduce((s,x)=>s+x.total,0), labProfit = labSales.reduce((s,x)=>s+(x.profit||0),0);
 
     const phSales = ls_get(K.PHARM_SALES).filter(s=>inRange(s.date));
-    const phRev = phSales.reduce((s,x)=>s+x.total,0);
+    const phRev = phSales.reduce((s,x)=>s+x.total,0), phProfit = phSales.reduce((s,x)=>s+(x.profit||0),0);
+
+    const expenses = ls_get(K.EXPENSES).filter(e=>inRange(e.date));
+    const totalExpenses = expenses.reduce((s,e)=>s+(e.amount||0),0);
+
+    // Faa'iidada Guud (Net Profit) = dakhliga Cashier (macmiil ma laha stock/cost) +
+    // faa'iidada Lab (dakhli - cost alaab) + faa'iidada Pharmacy (dakhli - cost dawo) - kharashaadka
+    const netProfit = apptRev + labProfit + phProfit - totalExpenses;
 
     $('repStats').innerHTML = `
-      <div class="stat-box"><small>Dakhliga Cashier</small><div class="val green">${fmtMoney(apptRev)}</div></div>
-      <div class="stat-box"><small>Dakhliga Lab</small><div class="val green">${fmtMoney(labRev)}</div></div>
-      <div class="stat-box"><small>Dakhliga Pharmacy</small><div class="val green">${fmtMoney(phRev)}</div></div>
-      <div class="stat-box"><small>Wadarta Guud</small><div class="val" style="color:var(--primary);">${fmtMoney(apptRev+labRev+phRev)}</div></div>
+      <div class="stat-box"><small>Dakhliga Cashier</small><div class="val">${fmtMoney(apptRev)}</div></div>
+      <div class="stat-box"><small>Dakhliga Lab</small><div class="val">${fmtMoney(labRev)}</div></div>
+      <div class="stat-box"><small>Dakhliga Pharmacy</small><div class="val">${fmtMoney(phRev)}</div></div>
+      <div class="stat-box"><small>Wadarta Dakhliga</small><div class="val" style="color:var(--primary);">${fmtMoney(apptRev+labRev+phRev)}</div></div>
+    `;
+    $('repProfitStats').innerHTML = `
+      <div class="stat-box"><small>Faa'iidada Lab (dakhli - cost)</small><div class="val green">${fmtMoney(labProfit)}</div></div>
+      <div class="stat-box"><small>Faa'iidada Pharmacy (dakhli - cost)</small><div class="val green">${fmtMoney(phProfit)}</div></div>
+      <div class="stat-box"><small>Wadarta Kharashaadka</small><div class="val red">${fmtMoney(totalExpenses)}</div></div>
+      <div class="stat-box" style="border:2px solid ${netProfit>=0?'var(--green)':'var(--red)'};"><small>Faa'iidada Guud (Net Profit)</small>
+        <div class="val" style="color:${netProfit>=0?'var(--green)':'var(--red)'};font-size:1.7rem;">${fmtMoney(netProfit)}</div></div>
     `;
     $('repApptTbl').innerHTML = appts.length ? `<div class="tbl-wrap"><table class="dtable"><thead><tr><th>Bukaan</th><th>Dhakhtar</th><th>Qiimo</th></tr></thead><tbody>
       ${appts.map(a=>`<tr><td>${sanitize(a.patientName)}</td><td>${sanitize(a.doctor||'')}</td><td>${fmtMoney(a.paid||0)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="text-muted">Ma jiro.</p>';
-    $('repLabTbl').innerHTML = labSales.length ? `<div class="tbl-wrap"><table class="dtable"><thead><tr><th>Receipt</th><th>Qiimo</th></tr></thead><tbody>
-      ${labSales.map(s=>`<tr><td>${s.receiptNo}</td><td>${fmtMoney(s.total)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="text-muted">Ma jiro.</p>';
-    $('repPharmTbl').innerHTML = phSales.length ? `<div class="tbl-wrap"><table class="dtable"><thead><tr><th>Invoice</th><th>Qiimo</th></tr></thead><tbody>
-      ${phSales.map(s=>`<tr><td>${s.id.slice(-8)}</td><td>${fmtMoney(s.total)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="text-muted">Ma jiro.</p>';
+    $('repLabTbl').innerHTML = labSales.length ? `<div class="tbl-wrap"><table class="dtable"><thead><tr><th>Receipt</th><th>Qiimo</th><th>Faa'iido</th></tr></thead><tbody>
+      ${labSales.map(s=>`<tr><td>${s.receiptNo}</td><td>${fmtMoney(s.total)}</td><td style="color:var(--green);">${fmtMoney(s.profit||0)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="text-muted">Ma jiro.</p>';
+    $('repPharmTbl').innerHTML = phSales.length ? `<div class="tbl-wrap"><table class="dtable"><thead><tr><th>Invoice</th><th>Qiimo</th><th>Faa'iido</th></tr></thead><tbody>
+      ${phSales.map(s=>`<tr><td>${s.id.slice(-8)}</td><td>${fmtMoney(s.total)}</td><td style="color:var(--green);">${fmtMoney(s.profit||0)}</td></tr>`).join('')}</tbody></table></div>` : '<p class="text-muted">Ma jiro.</p>';
+  },
+
+  /* ---- Kharashaadka Isbitalka (Expenses) — si Net Profit-ka loo xisaabiyo
+     si sax ah, waa in la ogaadaa waxa isbitalku ku bixiyay (mushahar,
+     kirada, alaab, iwm), lagana jaray dakhliga/faa'iidada guud. ---- */
+  renderExpenses(){
+    if(!$('expDate').value) $('expDate').value = todayStr();
+    const list = ls_get(K.EXPENSES).slice().sort((a,b)=>new Date(b.date)-new Date(a.date));
+    $('expTbody').innerHTML = list.length ? list.map(e=>`
+      <tr><td>${fmtDate(e.date)}</td><td>${sanitize(e.category)}</td><td>${fmtMoney(e.amount)}</td>
+        <td>${sanitize(e.note||'—')}</td><td>${sanitize(e.enteredBy||'—')}</td>
+        <td class="actions"><button class="btn btn-danger btn-sm" onclick="ReportsUI.delExpense('${e.id}')"><i class="bi bi-trash"></i></button></td></tr>`).join('')
+      : '<tr><td colspan="6" class="text-muted" style="text-align:center;padding:16px;">Wax kharash ah lama gelin weli.</td></tr>';
+  },
+  saveExpense(e){
+    e.preventDefault();
+    const date=$('expDate').value, category=$('expCategory').value, amount=parseFloat($('expAmount').value)||0, note=sanitize($('expNote').value,200);
+    if(!date || amount<=0){ Swal.fire({icon:'warning', title:'Fadlan buuxi taariikhda iyo lacagta'}); return; }
+    const list = ls_get(K.EXPENSES);
+    list.push({id:gid('EXP'), date, category, amount, note, enteredBy:APP.user.username, createdAt:new Date().toISOString()});
+    ls_set(K.EXPENSES, list);
+    $('expForm').reset(); $('expDate').value=todayStr();
+    this.renderExpenses();
+    Swal.fire({icon:'success', title:'Kharashka waa la keydiyay', timer:1200, showConfirmButton:false});
+  },
+  delExpense(id){
+    Swal.fire({title:'Tirtir kharashkan?', icon:'warning', showCancelButton:true}).then(r=>{
+      if(!r.isConfirmed) return;
+      ls_set(K.EXPENSES, ls_get(K.EXPENSES).filter(e=>e.id!==id));
+      this.renderExpenses();
+    });
   }
 };
 
@@ -1784,6 +2116,7 @@ const ReportsUI = {
 function debounce(fn, wait){ let t; return (...a)=>{ clearTimeout(t); t=setTimeout(()=>fn(...a), wait); }; }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  await DB.init();
   await initDefaultData();
 
   $('loginBtn').addEventListener('click', login);
@@ -1815,6 +2148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   $('btnAddMed').addEventListener('click', ()=>DocUI.addMedRow());
   $('btnAddLabTest').addEventListener('click', ()=>DocUI.addLabTestRow());
   $('btnSaveVisit').addEventListener('click', ()=>DocUI.saveVisit());
+  $('docPatSearch').addEventListener('input', debounce(()=>DocUI.searchPatients(),250));
 
   // Lab
   $('labPosSearch').addEventListener('input', debounce(()=>LabUI.renderPOS(),250));
@@ -1836,6 +2170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Reports
   $('repLoadBtn').addEventListener('click', ()=>ReportsUI.load());
+  $('expForm').addEventListener('submit', e=>ReportsUI.saveExpense(e));
 
   await checkSession();
 });
