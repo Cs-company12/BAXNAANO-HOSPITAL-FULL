@@ -310,7 +310,13 @@ tr.expired{background:#f8d7da!important;} tr.expiring{background:#fff3cd!importa
             <select id="apptDateFilter" class="form-select" style="width:auto;">
               <option value="">Dhammaan Taariikhaha</option>
               <option value="today" selected>Maanta</option>
+              <option value="yesterday">Shalay</option>
+              <option value="last7">7-dii Maalmood ee u dambeeyay</option>
+              <option value="last30">30-kii Maalmood ee u dambeeyay</option>
+              <option value="range">Taariikh Gaar ah...</option>
             </select>
+            <input type="date" id="apptDateFrom" class="form-control" style="width:150px;display:none;" placeholder="From">
+            <input type="date" id="apptDateTo" class="form-control" style="width:150px;display:none;" placeholder="To">
             <select id="apptDoctorFilter" class="form-select" style="width:auto;"><option value="">Dhammaan Dhakhtarada</option></select>
             <select id="apptStateFilter" class="form-select" style="width:auto;">
               <option value="">Dhammaan Xaaladaha</option>
@@ -1188,10 +1194,17 @@ const GlobalSearch = {
     const q = ($('globalSearchInput').value||'').toLowerCase().trim();
     const box = $('globalSearchResults');
     if(q.length<2){ box.innerHTML=''; return; }
-    const matches = ls_get(K.PATIENTS).filter(p=>`${p.name} ${p.mobile}`.toLowerCase().includes(q)).slice(0,8);
+    const allAppts = ls_get(K.APPTS);
+    const isDoctor = APP.user.role==='doctor';
+    let matches = ls_get(K.PATIENTS).filter(p=>`${p.name} ${p.mobile}`.toLowerCase().includes(q));
+    if(isDoctor){
+      // Dhakhtarku wuxuu ka helaa xog-baarka guud KALIYA bukaannadiisa
+      matches = matches.filter(p => allAppts.some(a => a.patientId===p.id && a.doctor===APP.user.doctorName));
+    }
+    matches = matches.slice(0,8);
     if(!matches.length){ box.innerHTML='<p class="text-muted" style="font-size:12px;padding:4px 2px;">Wax lama helin.</p>'; return; }
     box.innerHTML = matches.map(p=>{
-      const visits = ls_get(K.APPTS).filter(a=>a.patientId===p.id).sort((a,b)=>new Date(b.apptDate)-new Date(a.apptDate));
+      const visits = allAppts.filter(a=>a.patientId===p.id && (!isDoctor || a.doctor===APP.user.doctorName)).sort((a,b)=>new Date(b.apptDate)-new Date(a.apptDate));
       const last = visits[0];
       return `<div class="gs-result-item" onclick="GlobalSearch.select('${p.id}')">
         <strong>${sanitize(p.name)}</strong> <span class="text-muted">— ${sanitize(p.mobile||'—')}</span>
@@ -1277,6 +1290,14 @@ const ApptUI = {
     this.filter();
   },
 
+  handleDateFilterChange(){
+    const val = $('apptDateFilter').value;
+    const showRange = val==='range';
+    $('apptDateFrom').style.display = showRange?'':'none';
+    $('apptDateTo').style.display = showRange?'':'none';
+    this.filter();
+  },
+
   filter(){
     const appts = ls_get(K.APPTS);
     const q = ($('apptSearch').value||'').toLowerCase();
@@ -1285,7 +1306,28 @@ const ApptUI = {
     const stateF = $('apptStateFilter').value;
     const today = todayStr();
     const filtered = appts.filter(a=>{
-      if(dateF==='today' && !(a.createdAt||'').startsWith(today)) return false;
+      const recDate = (a.createdAt||'').split('T')[0];
+      if(dateF==='today' && recDate!==today) return false;
+      if(dateF==='yesterday'){
+        const y = new Date(); y.setDate(y.getDate()-1);
+        const yStr = `${y.getFullYear()}-${String(y.getMonth()+1).padStart(2,'0')}-${String(y.getDate()).padStart(2,'0')}`;
+        if(recDate!==yStr) return false;
+      }
+      if(dateF==='last7'){
+        const d = new Date(); d.setDate(d.getDate()-7);
+        const dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        if(recDate<dStr || recDate>today) return false;
+      }
+      if(dateF==='last30'){
+        const d = new Date(); d.setDate(d.getDate()-30);
+        const dStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        if(recDate<dStr || recDate>today) return false;
+      }
+      if(dateF==='range'){
+        const from = $('apptDateFrom').value, to = $('apptDateTo').value;
+        if(from && recDate<from) return false;
+        if(to && recDate>to) return false;
+      }
       if(docF && a.doctor!==docF) return false;
       if(stateF && a.state!==stateF) return false;
       if(q && !(`${a.apptNum} ${a.patientName} ${a.mobile} ${a.doctor}`.toLowerCase().includes(q))) return false;
@@ -1313,6 +1355,9 @@ const ApptUI = {
         </td>
       </tr>`;
     }).join('');
+    if(!filtered.length){
+      $('apptTbody').innerHTML = '<tr><td colspan="11" class="text-muted" style="text-align:center;padding:22px;"><i class="bi bi-calendar-x" style="font-size:1.3rem;display:block;margin-bottom:4px;"></i>Ballan lama helin taariikhdan.</td></tr>';
+    }
     $('apptCount').textContent = `Muujinaya ${filtered.length} / ${appts.length}`;
   },
 
@@ -1796,19 +1841,29 @@ const DocUI = {
     const q = ($('docPatSearch').value||'').toLowerCase().trim();
     const box = $('docPatResults');
     if(q.length<2){ box.innerHTML=''; return; }
-    const matches = ls_get(K.PATIENTS).filter(p=>`${p.name} ${p.mobile}`.toLowerCase().includes(q)).slice(0,9);
+    const allAppts = ls_get(K.APPTS);
+    const isAdmin = APP.user.role==='admin';
+    let matches = ls_get(K.PATIENTS).filter(p=>`${p.name} ${p.mobile}`.toLowerCase().includes(q));
+    if(!isAdmin){
+      // Dhakhtar kasta wuxuu arkaa oo raadin karaa KALIYA bukaannadiisa
+      // gaarka ah — kuwa uu horey ula kulmay — ma arki karo bukaannada
+      // dhakhtarrada kale.
+      matches = matches.filter(p => allAppts.some(a => a.patientId===p.id && a.doctor===APP.user.doctorName));
+    }
+    matches = matches.slice(0,9);
     box.innerHTML = matches.length ? matches.map(p=>{
-      const visits = ls_get(K.APPTS).filter(a=>a.patientId===p.id).length;
+      const visits = allAppts.filter(a=>a.patientId===p.id && (isAdmin || a.doctor===APP.user.doctorName)).length;
       return `<div class="card" style="cursor:pointer;margin-bottom:0;" onclick="DocUI.viewPatientHistory('${p.id}')">
         <div class="card-body" style="padding:.6rem .8rem;">
           <strong>${sanitize(p.name)}</strong><div style="font-size:11px;color:var(--text-muted);">${sanitize(p.mobile||'—')} · ${p.sex||'—'} · ${p.age||'—'}y</div>
-          <span class="badge badge-primary" style="margin-top:4px;">${visits} booqasho</span>
+          <span class="badge badge-primary" style="margin-top:4px;">${visits} booqasho${isAdmin?'':' adiga la xiriira'}</span>
         </div></div>`;
-    }).join('') : '<p class="text-muted">Bukaan lama helin.</p>';
+    }).join('') : '<p class="text-muted">Bukaan lama helin (ama uma jiro bukaan aad hore ula kulantay oo la mid ah).</p>';
   },
   viewPatientHistory(patientId){
     const p = ls_get(K.PATIENTS).find(x=>x.id===patientId); if(!p) return;
-    const visits = ls_get(K.APPTS).filter(a=>a.patientId===patientId && a.consulted)
+    const isAdmin = APP.user.role==='admin';
+    const visits = ls_get(K.APPTS).filter(a=>a.patientId===patientId && a.consulted && (isAdmin || a.doctor===APP.user.doctorName))
       .sort((a,b)=>new Date(b.apptDate)-new Date(a.apptDate));
     const rxAll = ls_get(K.RX).filter(r=>r.patientId===patientId);
     const labAll = ls_get(K.LABREQ).filter(r=>r.patientId===patientId);
@@ -2541,7 +2596,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Appointments
   $('btnNewAppt').addEventListener('click', ()=>ApptUI.open(null));
   $('apptSearch').addEventListener('input', debounce(()=>ApptUI.filter(),250));
-  $('apptDateFilter').addEventListener('change', ()=>ApptUI.filter());
+  $('apptDateFilter').addEventListener('change', ()=>ApptUI.handleDateFilterChange());
+  $('apptDateFrom').addEventListener('change', ()=>ApptUI.filter());
+  $('apptDateTo').addEventListener('change', ()=>ApptUI.filter());
   $('apptDoctorFilter').addEventListener('change', ()=>ApptUI.filter());
   $('apptStateFilter').addEventListener('change', ()=>ApptUI.filter());
   $('aPatientName').addEventListener('input', ()=>ApptUI.searchPatient());
